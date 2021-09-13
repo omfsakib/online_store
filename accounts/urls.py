@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path('register/',views.registerPage,name="register"),
+    path('token/',views.token_send,name="token_send"),
+    path('success/',views.success,name="success"),
     path('login/',views.loginPage,name="login"),
     path('logout/',views.logoutUser,name="logout"),
 

@@ -1,6 +1,7 @@
 
 from django.shortcuts import render,redirect
 from django.forms import inlineformset_factory
+from django.contrib.auth.models import User
 
 from .models import *
 from .forms import OrderForm,CreateUserForm
@@ -18,15 +19,36 @@ def registerPage(request):
         form = CreateUserForm()
         if request.method == 'POST':
             form = CreateUserForm(request.POST)
-            if form.is_valid():
-                form.save()
-                user = form.cleaned_data.get('username')
-                messages.success(request,'Account was created for ' + user)
-                return redirect('login')
+            try:
+                if User.objects.filter(username=username).first():
+                    messages.success(request, 'Username is taken.')
+                    return redirect('/register')
 
-        context = {'form':form}
-        return render(request,'accounts/register.html',context)
+                elif User.objects.filter(email=email).first():
+                    messages.success(request, 'This Email is taken.')
+                    return redirect('/register')
 
+                if form.is_valid():
+                    user_obj = User.objects.create(username = username,email=email)
+                    user_obj.set_password(password)
+                    profile_obj = UserProfile.object.create(user = user_obj,auth_token=str(uuid.uuid4))
+                    profile.obj.save()
+                    user = form.cleaned_data.get('username')
+                    messages.success(request,'Account was created for ' + user)
+                    return redirect('/token')
+            
+            except Exception(e):
+                print(e)
+
+            context = {'form':form}
+            return render(request,'accounts/register.html',context)
+
+def success(request):
+    return render(request, 'accounts/success.html')
+
+def token_send(request):
+    return render(request, 'accounts/token_send.html')
+    
 def loginPage(request):
     if request.user.is_authenticated:
         return redirect('home')
