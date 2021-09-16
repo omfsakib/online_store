@@ -5,9 +5,12 @@ urlpatterns = [
     path('register/',views.registerPage,name="register"),
     path('token/',views.token_send,name="token_send"),
     path('success/',views.success,name="success"),
+    path('verify/<auth_token>',views.verify,name="verify"),
+    path('error/',views.error_page,name='error'),
     path('login/',views.loginPage,name="login"),
     path('logout/',views.logoutUser,name="logout"),
-
+    path('user/',views.userPage,name='user-page'),
+    path('account/',views.accountSettings,name='account'),
     path('', views.home,name='home'),
     path('products/', views.products,name='products'),
     path('customer/<str:pk>/', views.customers,name='customer'),
