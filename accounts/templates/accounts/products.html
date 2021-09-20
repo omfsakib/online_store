@@ -8,6 +8,11 @@
             <div class="card card-body">
                 <h5>Products</h5>
             </div>
+            <form action="" method="POST">
+                {% csrf_token %}
+            {{form}}
+            <input class="btn btn-warning" type="submit" name='Add'>
+        </form>
             <div class="card card-body">
                 <table class="table">
                     <tr>

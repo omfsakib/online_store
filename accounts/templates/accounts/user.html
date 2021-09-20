@@ -2,6 +2,11 @@
 {% block content %}
 {% include 'accounts/status.html' %}
 
+
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'create_order' user.customer.id %}">Order</a>
+</li>
+
 <div class="row">
     <div class="col-md">
         <div class="card card-body">
@@ -11,6 +16,7 @@
                     <th>Category</th>
                     <th>Date Ordered</th>
                     <th>Status</th>
+                    <th>Delete</th>
                 </tr>
                 {% for order in orders %}
                 <tr>
@@ -18,6 +24,7 @@
                     <th>{{order.product.category}}</th>
                     <th>{{order.date_created}}</th>
                     <th>{{order.status}}</th>
+                    <td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' order.id %}">Delete</a></td>
                 </tr>
                 {% endfor %}
             </table>

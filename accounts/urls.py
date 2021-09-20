@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('register/',views.registerPage,name="register"),
+    path('shopregister/',views.shopOwnerRegisterPage,name="shopregister"),
     path('token/',views.token_send,name="token_send"),
     path('success/',views.success,name="success"),
     path('verify/<auth_token>',views.verify,name="verify"),

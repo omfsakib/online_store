@@ -5,7 +5,7 @@ import uuid
 from django.conf import settings
 from django.core.mail import send_mail
 from .models import *
-from .forms import CustomerForm, OrderForm,CreateUserForm
+from .forms import *
 from django.contrib.auth import authenticate,login,logout
 from .filters import OrderFilter
 from django.contrib import messages
@@ -53,6 +53,45 @@ def registerPage(request):
 
     context = {'form':form}
     return render(request,'accounts/register.html',context)
+
+@unauthenticted_user
+def shopOwnerRegisterPage(request):
+    form = CreateUserForm()
+    username = request.POST.get('username')
+    email = request.POST.get('email')
+    password = request.POST.get('password1')
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        try:
+            if User.objects.filter(username=username).first():
+                messages.success(request, 'Username is taken.')
+                return redirect('/shopregister')
+
+            elif User.objects.filter(email=email).first():
+                messages.success(request, 'This Email is taken.')
+                return redirect('/shopregister')
+
+            if form.is_valid():
+                user_obj = User.objects.create(username =username,email=email,is_staff = True)
+                user_obj.set_password(password)
+                user_obj.save()
+                auth_token=str(uuid.uuid4())
+                profile_obj = UserProfile.objects.create(user = user_obj,auth_token=auth_token)
+                profile_obj.save()
+                group = Group.objects.get(name = 'shopowner')
+                user_obj.groups.add(group)
+                ShopOwner.objects.create(
+                    user = user_obj
+                )
+                send_mail_after_registration(email,auth_token)
+                messages.success(request,'Account was created for ' + username)
+                return redirect('/token')
+        
+        except Exception as e:
+            print(e)
+
+    context = {'form':form}
+    return render(request,'accounts/shopregister.html',context)
 
 def success(request):
     return render(request, 'accounts/success.html')
@@ -123,7 +162,6 @@ def home(request):
     return render(request,'accounts/dashboard.html', context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['customer'])
 def userPage(request):
     orders = request.user.customer.order_set.all()
 
@@ -136,22 +174,40 @@ def userPage(request):
     return render(request, 'accounts/user.html', context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['customer'])
 def accountSettings(request):
-    customer = request.user.customer
-    form = CustomerForm(instance=customer)
+    group = Group.objects.get(name = 'customer')
+    if group == 'customer':
+        customer = request.user.customer
+        form = CustomerForm(instance=customer)
+    else:
+        shopowner = request.user.shopowner
+        form = ShopOwnerForm(instance=shopowner)
+    form2 = UpdateProfileForm(instance=request.user)
     if request.method == 'POST':
-        form = CustomerForm(request.POST, request.FILES, instance=customer)
-        if form.is_valid():
+        if group == 'customer':
+            form = CustomerForm(request.POST, request.FILES, instance=customer)
+        else:
+            form = ShopOwnerForm(request.POST, request.FILES, instance=shopowner)
+        form2 = UpdateProfileForm(request.POST, instance=request.user)
+        if (form and form2).is_valid():
             form.save()
-    context = {'form':form}
+            form2.save()
+            return redirect('/')
+    context = {'form':form,'form2':form2}
     return render(request,'accounts/account_settings.html',context)
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
 def products(request):
+    form = ProductForm()
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
     products = Product.objects.all()
-    return render(request,'accounts/products.html',{'products':products})
+
+    context ={'products':products,'form':form}
+    return render(request,'accounts/products.html',context)
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
@@ -167,11 +223,11 @@ def customers(request, pk):
     return render(request,'accounts/customer.html',context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['shopowner'])
+@allowed_users(allowed_roles=['customer'])
 def createorder(request,pk):
     OrderFormSet =inlineformset_factory(Customer, Order, fields=('product','status'),extra=10)
     customer = Customer.objects.get(id=pk)
-    formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
+    formset = OrderFormSet()
     #form = OrderForm(initial={'customer':customer})
     if request.method =='POST':
         #form = OrderForm(request.POST)
@@ -187,17 +243,16 @@ def createorder(request,pk):
 @allowed_users(allowed_roles=['shopowner'])
 def updateOrder(request,pk):
     order = Order.objects.get(id=pk)
-    form = OrderForm(instance=order)
+    form = UpdateOrderForm(instance=order)
     if request.method =='POST':
-        form = OrderForm(request.POST,instance=order)
+        form = UpdateOrderForm(request.POST,instance=order)
         if form.is_valid():
             form.save()
             return redirect('/')
     context = {'form':form}
-    return render(request,'accounts/order_form.html',context)
+    return render(request,'accounts/update_order.html',context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['shopowner'])
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
     if request.method == "POST":

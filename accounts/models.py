@@ -5,14 +5,21 @@ from django.contrib.auth.models import User
 
 class Customer(models.Model):
     user = models.OneToOneField(User, null = True,blank=True ,on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, null=True)
     phone = models.CharField(max_length=200, null=True )
-    email = models.CharField(max_length=200,null=True)
     profile_pic = models.ImageField(default="profile.png",null = True,blank = True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return self.name
+        return self.user.username
+
+class ShopOwner(models.Model):
+    user = models.OneToOneField(User, null = True,blank=True ,on_delete=models.CASCADE)
+    phone = models.CharField(max_length=200, null=True )
+    profile_pic = models.ImageField(default="profile.png",null = True,blank = True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return self.user.username
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -21,7 +28,19 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return str(self.user)
+
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user = instance)
+        print('Profile created')
+
+
+def update_profile(sender, instance, created, **kwargs):
+    if created == False:
+        instance.UserProfile.save()
+        print('Profile Updated')
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=200, null=True)
