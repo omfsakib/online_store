@@ -1,0 +1,39 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .profile-pic{
+        max-width: 200px;
+        max-height: 200px;
+        margin: 0 auto;
+        border-radius: 50%;
+    }
+</style>
+
+<br>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-body">
+            <a href="{% url 'home' %}" class="btn btn-warning">&#8592; Back to Home</a>
+            <hr>
+            <h3 style="text-align: center;">Account Settings</h3>
+            <hr>
+            <img src="{{ request.user.customer.profile_pic.url }}" class="profile-pic">
+            <img src="{{ request.user.shopowner.profile_pic.url }}" class="profile-pic">
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card card-body">
+            <p> Name: {{ user.first_name }} {{ user.last_name }}</p>
+            <p> Email: {{ user.email }}</p>
+            <p> Phone: {{ user.shopowner.phone }}</p><hr>
+            <div class="profile_btn">
+                <a href="{% url 'edit_account' %}" class="btn btn-info" role="button">Edit Profile</a>
+                <a href="#" class="btn btn-primary" role="button">Change Password</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

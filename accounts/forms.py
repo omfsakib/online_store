@@ -30,6 +30,14 @@ class UpdateOrderForm(ModelForm):
         exclude = ['customer']
 
 class ProductForm(ModelForm):
+    name = forms.CharField(label='Product Name',widget=forms.TextInput(attrs={'placeholder': 'Product Name'}))
+    price = forms.FloatField(label='Price',widget=forms.TextInput(attrs={'placeholder': 'Price'}))
+    description = forms.CharField(label='Description',widget=forms.TextInput(attrs={'placeholder': 'Description'}))
+    tags = forms.ModelMultipleChoiceField(
+            queryset=Tag.objects.all(),
+            widget=forms.CheckboxSelectMultiple,
+            required=True)
+    
     class Meta:
         model = Product
         fields = '__all__'

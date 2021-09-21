@@ -1,4 +1,5 @@
 {% extends 'accounts/main.html' %}
+{% load widget_tweaks %}
 {% load static %}
 {% block content %}
 
@@ -9,13 +10,16 @@
         margin: 0 auto;
         border-radius: 50%;
     }
+    .currently a{
+        display: none;
+    }
 </style>
 
 <br>
 <div class="row">
     <div class="col-md-3">
         <div class="card card-body">
-            <a href="{% url 'home' %}" class="btn btn-warning">&#8592; Back to Profile</a>
+            <a href="{% url 'account' %}" class="btn btn-warning">&#8592; Back to Profile</a>
             <hr>
             <h3 style="text-align: center;">Account Settings</h3>
             <hr>
@@ -27,8 +31,21 @@
         <div class="card card-body">
             <form action="" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{form2.as_p}}
-                {{form.as_p}}
+                <p>
+                    {{ form2.first_name|add_class:'form-control'|add_class:'edit_name' }}
+                </p>
+                <p>
+                    {{ form2.last_name|add_class:'form-control'|add_class:'edit_name' }}
+                </p>
+                <p>
+                    {{ form2.email|add_class:'form-control'|add_class:'edit_email' }}
+                </p>
+                <p>
+                    {{ form.phone|add_class:'form-control' }}
+                </p>
+                <p class="currently">
+                    {{ form.profile_pic|add_class:'form-control' }}
+                </p>
                 <input type="submit" name="Update Information" class="btn btn-primary">
             </form>
         </div>

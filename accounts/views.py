@@ -174,6 +174,15 @@ def userPage(request):
     return render(request, 'accounts/user.html', context)
 
 @login_required(login_url='login')
+def viewAccount(request, pk = None):
+    if pk:
+        user = User.objects.get(pk=pk)
+    else:
+        user = request.user
+    args = {'user':user}
+    return render(request,'accounts/account.html',args)
+
+@login_required(login_url='login')
 def accountSettings(request):
     group = Group.objects.get(name = 'customer')
     if group == 'customer':

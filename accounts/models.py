@@ -1,3 +1,4 @@
+from django import forms
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -50,6 +51,7 @@ class Tag(models.Model):
 
 class Product(models.Model):
     CATEGORY =(
+        ('','Choose Category'),
         ('Indoor','Indoor'),
         ('Out Door','Out Door')
     )
