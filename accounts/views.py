@@ -169,8 +169,11 @@ def userPage(request):
     delivered = orders.filter(status='Delivered').count()
     pending = orders.filter(status='Pending').count()
 
+    myFilter = OrderFilter(request.GET,queryset=orders)
+    orders = myFilter.qs
+
     context = {'orders':orders,'total_orders':total_orders,
-    'delivered':delivered,'pending':pending}
+    'delivered':delivered,'pending':pending,'myFilter':myFilter}
     return render(request, 'accounts/user.html', context)
 
 @login_required(login_url='login')
@@ -185,23 +188,24 @@ def viewAccount(request, pk = None):
 @login_required(login_url='login')
 def accountSettings(request):
     group = Group.objects.get(name = 'customer')
-    if group == 'customer':
+    print(group)
+    try: 
         customer = request.user.customer
         form = CustomerForm(instance=customer)
-    else:
+    except:
         shopowner = request.user.shopowner
         form = ShopOwnerForm(instance=shopowner)
     form2 = UpdateProfileForm(instance=request.user)
     if request.method == 'POST':
-        if group == 'customer':
+        try:
             form = CustomerForm(request.POST, request.FILES, instance=customer)
-        else:
+        except:
             form = ShopOwnerForm(request.POST, request.FILES, instance=shopowner)
         form2 = UpdateProfileForm(request.POST, instance=request.user)
         if (form and form2).is_valid():
             form.save()
             form2.save()
-            return redirect('/')
+            return redirect('/account')
     context = {'form':form,'form2':form2}
     return render(request,'accounts/account_settings.html',context)
 

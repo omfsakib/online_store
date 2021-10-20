@@ -9,7 +9,8 @@
                 {% csrf_token %}
                 {{formset.management_form}}
                 {% for form in formset %}
-                    {{form}}
+                    {{form.product}}
+                    <p style="display: none;">{{form.status}}</p>
                     <hr>
                 {% endfor %}
 

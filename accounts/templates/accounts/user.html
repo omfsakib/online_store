@@ -1,12 +1,41 @@
 {% extends 'accounts/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
 {% block content %}
 {% include 'accounts/status.html' %}
 
-
+<style>
+    .filter-form{
+        width: 170px;
+        float: left;
+        display: inline-block;
+        margin-right: 20px;
+    }
+    .filter-form:last-child{
+        width: 77px;
+    }
+</style>
 <li class="nav-item">
     <a class="nav-link" href="{% url 'create_order' user.customer.id %}">Order</a>
 </li>
 
+<div class="row">
+    <div class="col">
+        <div class="card card-body" style="align-items: center;">
+            <div class="text-center">
+                <h3>Filter Order</h3>
+                <hr>
+            </div>
+            <form method="get">
+                <p class="filter-form">Product Name: <br><br> {{ myFilter.form.product|add_class:'form-control' }}</p>
+                <p class="filter-form">Status: <br><br>{{ myFilter.form.status|add_class:'form-control' }}</p>
+                <p class="filter-form">Start Date: <br><br><input class="form-control" type="date" name="start_date" id="id_start_date"></p>
+                <p class="filter-form">End Date: <br><br><input class="form-control" type="date" name="end_date" id="id_end_date"></p>
+                <p class="filter-form"><br><br><input class="btn btn-primary"  type="submit" name="Search" ></p>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md">
         <div class="card card-body">

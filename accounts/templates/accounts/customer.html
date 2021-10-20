@@ -1,11 +1,24 @@
 {% extends 'accounts/main.html' %}
-
+{% load static %}
+{% load widget_tweaks %}
 {% block content %}
+<style>
+    .filter-form{
+        width: 170px;
+        float: left;
+        display: inline-block;
+        margin-right: 20px;
+    }
+    .filter-form:last-child{
+        width: 77px;
+    }
+</style>
     <br>
+    <div class="container">
     <div class="row">
         <div class="col-md">
             <div class="card card-body">
-                <h5>Customer: {{ customer.name }}</h5>
+                <h5>Customer: {{ customer.user.first_name }} {{ customer.user.last_name }}</h5>
                 <hr>
                 <a href="" class="btn btn-outline-info btn-sm btn-block">Update Customer</a>
                 <a href="{% url 'create_order' customer.id %}" class="btn btn-outline-danger btn-sm btn-block">Place new Order</a>
@@ -15,7 +28,7 @@
             <div class="card card-body">
                 <h5>Contact Informtion</h5>
                 <hr>
-                <p>Email: {{ customer.email }}</p>
+                <p>Email: {{ customer.user.email }}</p>
                 <p>Phone: {{ customer.phone }}</p>
             </div>
         </div>
@@ -30,10 +43,17 @@
     <br>
     <div class="row">
         <div class="col">
-            <div class="card card-body">
+            <div class="card card-body" style="align-items: center;">
+                <div class="text-center">
+                    <h3>Filter Order</h3>
+                    <hr>
+                </div>
                 <form method="get">
-                    {{ myFilter }}
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <p class="filter-form">Product Name: <br><br> {{ myFilter.form.product|add_class:'form-control' }}</p>
+                    <p class="filter-form">Status: <br><br>{{ myFilter.form.status|add_class:'form-control' }}</p>
+                    <p class="filter-form">Start Date: <br><br><input class="form-control" type="date" name="start_date" id="id_start_date"></p>
+                    <p class="filter-form">End Date: <br><br><input class="form-control" type="date" name="end_date" id="id_end_date"></p>
+                    <p class="filter-form"><br><br><input class="btn btn-primary"  type="submit" name="Search" ></p>
                 </form>
             </div>
         </div>
@@ -66,4 +86,5 @@
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

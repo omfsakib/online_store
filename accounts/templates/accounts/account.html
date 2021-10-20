@@ -27,7 +27,11 @@
         <div class="card card-body">
             <p> Name: {{ user.first_name }} {{ user.last_name }}</p>
             <p> Email: {{ user.email }}</p>
+            {% if request.user.is_staff %}
             <p> Phone: {{ user.shopowner.phone }}</p><hr>
+            {% else %}
+            <p> Phone: {{ user.customer.phone }}</p><hr>
+            {% endif %}
             <div class="profile_btn">
                 <a href="{% url 'edit_account' %}" class="btn btn-info" role="button">Edit Profile</a>
                 <a href="#" class="btn btn-primary" role="button">Change Password</a>

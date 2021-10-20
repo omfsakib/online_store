@@ -3,16 +3,19 @@
 {% load static %}
 {% block content %}
 <br>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card card-body">
-            <form action="" method="POST">
-                {% csrf_token %}
-                    {{form}}
-                 <hr>
-                <input type="submit" name="Submit">
-            </form>
-                    
+<div class="container">
+    <div class="row">
+        <div class="col-md">
+            <div class="card card-body">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                        <p >{{form.product|add_class:'form-control'}}</p>
+                        <p>{{form.status|add_class:'form-control'}}</p>
+                    <hr>
+                    <input class="btn btn-primary" type="submit" name="Submit">
+                </form>
+                        
+            </div>
         </div>
     </div>
 </div>
