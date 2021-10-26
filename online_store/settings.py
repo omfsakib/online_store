@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'ecommerce_web',
     'django_filters',
     'widget_tweaks',
 ]

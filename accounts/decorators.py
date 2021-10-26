@@ -29,7 +29,7 @@ def shopowner_only(view_func):
         if request.user.groups.exists():
             group = request.user.groups.all()[0].name
         if group == 'customer':
-            return redirect('user-page')
+            return redirect('store')
         if group == 'shopowner':
             return view_func(request, *args, **kwargs)
     

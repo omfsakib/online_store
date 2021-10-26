@@ -32,9 +32,13 @@ class UpdateOrderForm(ModelForm):
 class ProductForm(ModelForm):
     name = forms.CharField(label='Product Name',widget=forms.TextInput(attrs={'placeholder': 'Product Name'}))
     price = forms.FloatField(label='Price',widget=forms.TextInput(attrs={'placeholder': 'Price'}))
-    description = forms.CharField(label='Description',widget=forms.TextInput(attrs={'placeholder': 'Description'}))
+    description = forms.CharField(max_length=50,label='Description',widget=forms.Textarea(attrs={'placeholder': 'Max 50 words'}))
     tags = forms.ModelMultipleChoiceField(
             queryset=Tag.objects.all(),
+            widget=forms.CheckboxSelectMultiple,
+            required=True)
+    category = forms.ModelMultipleChoiceField(
+            queryset=Category.objects.all(),
             widget=forms.CheckboxSelectMultiple,
             required=True)
     

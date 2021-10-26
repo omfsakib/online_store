@@ -25,6 +25,9 @@
         </li>
         {% else %}
         <li class="nav-item">
+          <a class="nav-link" href="{% url 'user-page' %}">Dashboard</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="{% url 'account' %}">Profile</a>
         </li>
         {% endif %}
