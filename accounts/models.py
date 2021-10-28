@@ -75,11 +75,24 @@ class Order(models.Model):
     )
     customer = models.ForeignKey(Customer, null=True, on_delete= models.SET_NULL)
     product = models.ForeignKey(Product, null=True, on_delete= models.SET_NULL)
+    complete = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     status = models.CharField(default="Pending",max_length=200,blank=True, null=True,choices=STATUS)
 
     def __str__(self):
         return self.product.name    
+    
+    @property
+    def get_cart_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total
+    
+    @property
+    def get_cart_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total
     
 
 

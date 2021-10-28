@@ -17,8 +17,6 @@
         border-radius: 15px;
     }
     .slider-btn{
-        background-color: #c3c6d0;
-        border: 1px solid aquamarine;
         border-radius: 15px;
         margin-left: -50px;
     }
@@ -28,6 +26,10 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+    
+    .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12{
+        margin-top: 10px;
     }
     .item-details .item-center{ 
         margin: 0;
@@ -43,10 +45,10 @@
         border-radius: 5px;
     }
     .carousel-control-next-icon{
-      margin-left: 150px;
+      margin-left: 50px;
     }
     .carousel-control-prev-icon{
-      margin-left: -150px;
+      margin-left: -50px;
     }
     .col{
       float: left;
@@ -112,6 +114,32 @@
         margin-bottom: 12px;
         margin-top: -10px;
     }
+    #searchInput{
+      background-image: url("{% static '/images/searchicon.png' %}"); 
+        background-position: 10px 10px; 
+        background-repeat: no-repeat; 
+        width: 70%;
+        font-size: 16px;
+        padding: 10px 20px 10px 40px;
+        border: 1px solid #ddd; 
+    }
+    .box-element{
+        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 10px;
+    }
+    .thumbnail{
+        width: 100%;
+        height: 200px;
+        -webkit-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+          -moz-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+          box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    }
+
+    .product{
+        border-radius: 0 0 4px 4px;
+    }
 </style>
 <script>
   function myFunction() {
@@ -132,29 +160,56 @@
       }
     }
 </script>
-<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel"> 
+<div class="row">
+  <div class="col-md-3">
+    <form action="" method="get">
+      <p class="filter-form">Price range: <br><br> <input type="number" class="form-control" placeholder="From..." name="start_price" id="id_start_price">
+        <br><input type="number" class="form-control" placeholder="To..." name="end_price" id="id_end_price"></p>
+      <p class="filter-form">Date added product:<br><br><input type="date" class="form-control" placeholder="From..." name="start_date" id="id_start_date">
+      <br> <input type="date" class="form-control" placeholder="To..." name="end_date" id="id_end_date"></p>
+      <div class="dropdown filter-form">
+        <button style="width: 100%;" class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Filter Category
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search tags">
+            {{ productFilter.form.category }}
+        </div>
+      </div>
+      <div class="dropdown filter-form">
+       <button style="width: 100%;" class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Filter Tags
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search tags">
+            {{ productFilter.form.tags }}
+        </div>
+      </div>
+      <p class="filter-form"><br><button class="btn btn-md btn-info" type="submit">Filter</button></p>
+    </form>
+  </div>
+  <div class="col-md-6"><div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel"> 
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img class="d-block w-100" style="height: 250px;" src="..." alt="First slide">
+        <img class="d-block w-100" style="height: 250px;" src="" alt="First slide">
       </div>
       {% for product in products %}
       <div class="carousel-item">
           <div class="row">
-              <div class="col-md-4 product-img">
+              <div class="col-md-5 product-img">
                 <img class="d-block w-100" src="{{ product.img.url }}" alt="Second slide">
               </div>
-              <div class="col-md-4 item-details">
+              <div class="col-md-5 item-details">
                   <div class="item-center">
-                    <h3>Product Name: <i><b>{{ product.name }}</b></i></h3>
-                    <h4>Category: <i>{{ product.category }}</i></h4>
-                    <h4>Price: <i>BDT {{ product.price }}TK</i></h4>
+                    <h3><i><b>{{ product.name }}</b></i></h3>
                     {% if product.description %}
-                    <p>About Product: {{ product.description }}</p>
+                    <p>{{ product.description }}</p>
                     {% endif %}
+                    <h4>Price: <i>BDT {{ product.price }}TK</i></h4>
                   </div>
               </div>
-              <div class="col-md-3 slider-btn">
-                  <button class="btn btn-lg btn-info">Order Now</button>
+              <div class="col-md-2 slider-btn">
+                  <button class="btn btn-md btn-info">Order Now</button>
               </div>
           </div>
         
@@ -169,64 +224,25 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="sr-only">Next</span>
     </a>
-  </div>
-  <div class="container store-mid">
-    <p class="mid-btn">
-      <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-        Filter Product
-      </button>
-      <hr>
-    </p>
-    <div class="collapse" id="collapseExample">
-      <div class="card card-body">
-        
-    <form action="" method="get">
-      <p class="filter-form">Product Name: <br><br> <input type="text" name="name" placeholder="Enter name..." class="form-control" id="id_name"> </p>
-      <p class="filter-form">Price range: <br><br> <input type="number" class="form-control" placeholder="From..." name="start_price" id="id_start_price">
-        <br><input type="number" class="form-control" placeholder="To..." name="end_price" id="id_end_price"></p>
-      <p class="filter-form">Date added product:<br><br><input type="date" class="form-control" placeholder="From..." name="start_date" id="id_start_date">
-      <br> <input type="date" class="form-control" placeholder="To..." name="end_date" id="id_end_date"></p>
-      <div class="dropdown filter-form">
-        <br><br><button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Filter Category
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search tags">
-            {{ productFilter.form.category }}
-        </div>
-      </div>
-      <div class="dropdown filter-form">
-        <br><br><button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Filter Tags
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search tags">
-            {{ productFilter.form.tags }}
-        </div>
-      </div><br><br>
-       <button class="btn btn-md btn-info" type="submit">Submit</button>
+  </div></div>
+  <div class="col-md-3">
+    <form method="get">
+      <p><input type="text" placeholder="Search product..." id="searchInput" style="float: left;" class="form-control" name="name" id="id_name"> 
+        <button class="btn btn-info" style="margin-left: 15px;" type="submit">Search</button></p>
     </form>
-      </div>
-    </div>
+  </div>
+</div>
+<div class="row">
   {% for product in products %}
-    <div class="col">
-        <div class="col-img">
-          <img class="center" src="{{ product.img.url }}" alt="">
-        </div>
-        <hr>
-        <div class="col-details">
-          <div class="item-center">
-            <p>Product Name: <i><b>{{ product.name }}</b></i></p>
-            <p>Price: <i>BDT {{ product.price }}TK</i></p>
-            {% if product.description %}
-            <p>{{ product.description }}</p>
-            {% endif %}
-          </div>
-        </div>
-        <div class="col-btn">
-          <button class="btn btn-sm btn-info">Add to cart</button> 
-        </div>
+  <div class="col-lg-4">
+    <img class="thumbnail" src="{{ product.img.url }}" alt="">
+    <div class="box-element product">
+      <h6><strong>{{ product.name }}</strong></h6><hr>
+      <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+      <a href="#" class="btn btn-outline-success">View</a>
+      <h4 style="display: inline-block; float: right;">${{product.price|floatformat:0}}</h4>
     </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock %}
