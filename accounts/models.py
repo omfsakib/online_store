@@ -62,6 +62,7 @@ class Product(models.Model):
     description = models.CharField(max_length=200, null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     tags = models.ManyToManyField(Tag)
+    digital = models.BooleanField(default=False, null=True, blank=False)
     img = models.ImageField(default="product-pic.jpg",null = True,blank = True)
 
     def __str__(self):
@@ -76,11 +77,21 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, null=True, on_delete= models.SET_NULL)
     product = models.ForeignKey(Product, null=True, on_delete= models.SET_NULL)
     complete = models.BooleanField(default=False)
+    transaction_id = models.CharField(max_length=200, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     status = models.CharField(default="Pending",max_length=200,blank=True, null=True,choices=STATUS)
 
     def __str__(self):
-        return self.product.name    
+        return str(self.id)
+
+    @property
+    def shipping(self):
+        shipping = False
+        orderitems = self.orderitem_set.all()
+        for i in orderitems:
+            if i.product.digital == False:
+                shipping = True
+        return shipping
     
     @property
     def get_cart_total(self):
