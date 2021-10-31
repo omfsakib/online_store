@@ -4,5 +4,7 @@ from django.contrib import admin
 
 from .models import *
 
+admin.site.register(Subscriber)
+admin.site.register(MailMessage)
 admin.site.register(OrderItem)
 admin.site.register(ShippingAddress)

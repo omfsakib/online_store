@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from django.contrib.auth.models import User
 from django import forms
 from .models import *
-
+from ecommerce_web.models import *
 
 class CustomerForm(ModelForm):
     class Meta:
@@ -20,12 +20,12 @@ class ShopOwnerForm(ModelForm):
 
 class OrderForm(ModelForm):
     class Meta:
-        model = Order
+        model = OrderItem
         fields = '__all__'
 
 class UpdateOrderForm(ModelForm):
     class Meta:
-        model = Order
+        model = OrderItem
         fields = '__all__'
         exclude = ['customer']
 

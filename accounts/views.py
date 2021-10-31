@@ -4,8 +4,11 @@ from django.contrib.auth.models import User
 import uuid
 from django.conf import settings
 from django.core.mail import send_mail
+from django_pandas.io import read_frame
 from .models import *
+from ecommerce_web.models import *
 from .forms import *
+from ecommerce_web.forms import *
 from django.contrib.auth import authenticate,login,logout
 from .filters import OrderFilter
 from django.contrib import messages
@@ -146,7 +149,7 @@ def logoutUser(request):
 @login_required(login_url='login')
 @shopowner_only
 def home(request):
-    orders = Order.objects.all()
+    orders = OrderItem.objects.all().order_by('-date_added')
     customers = Customer.objects.all()
 
     total_customers = customers.count()
@@ -163,7 +166,7 @@ def home(request):
 
 @login_required(login_url='login')
 def userPage(request):
-    orders = request.user.customer.order_set.all()
+    orders = request.user.customer.orderitem_set.all()
 
     total_orders = orders.count()
     delivered = orders.filter(status='Delivered').count()
@@ -226,8 +229,7 @@ def products(request):
 @allowed_users(allowed_roles=['shopowner'])
 def customers(request, pk):
     customer = Customer.objects.get(id=pk)
-
-    orders = customer.order_set.all()
+    orders = customer.orderitem_set.all()
     order_count = orders.count()
     myFilter = OrderFilter(request.GET,queryset=orders)
     orders = myFilter.qs
@@ -255,22 +257,51 @@ def createorder(request,pk):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
 def updateOrder(request,pk):
-    order = Order.objects.get(id=pk)
+    order = OrderItem.objects.get(id=pk)
     form = UpdateOrderForm(instance=order)
     if request.method =='POST':
         form = UpdateOrderForm(request.POST,instance=order)
         if form.is_valid():
             form.save()
             return redirect('/')
-    context = {'form':form}
+    context = {'form':form,'order':order}
     return render(request,'accounts/update_order.html',context)
 
 @login_required(login_url='login')
 def deleteOrder(request, pk):
-    order = Order.objects.get(id=pk)
+    order = OrderItem.objects.get(id=pk)
     if request.method == "POST":
         order.delete()
         return redirect('/')
 
     context = {'item':order}
     return render(request,'accounts/delete.html',context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['shopowner'])
+def mail_letter(request):
+    emails = Subscriber.objects.all()
+    df = read_frame(emails, fieldnames=['email'])
+    mail_list = df['email'].values.tolist()
+    if request.method == 'POST':
+        form = MailMessageForm(request.POST)
+        if form.is_valid():
+            form.save()
+            title = form.cleaned_data.get('title')
+            message = form.cleaned_data.get('message')
+            send_mail(
+                title,
+                message,
+                '',
+                mail_list,
+                fail_silently=False
+            )
+            messages.success(request, 'Message has sent to all Subscribers')
+            return redirect('/mail')
+    else:
+        form = MailMessageForm()
+    
+    mails = MailMessage.objects.all().order_by('-id')
+
+    context = {'form':form,'mails':mails,'emails':emails}
+    return render(request, 'accounts\mail_letter.html',context)

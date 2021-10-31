@@ -2,20 +2,47 @@
 {% load widget_tweaks %}
 {% load static %}
 {% block content %}
+
 <br>
 <div class="container">
     <div class="row">
-        <div class="col-md">
+        <div class="col-md-6">
             <div class="card card-body">
-                <form action="" method="POST">
-                    {% csrf_token %}
-                        <p >{{form.product|add_class:'form-control'}}</p>
-                        <p>{{form.status|add_class:'form-control'}}</p>
-                    <hr>
-                    <input class="btn btn-primary" type="submit" name="Submit">
-                </form>
-                        
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="{{order.product.img.url}}" alt="Product Img">
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3>{{order.product}}</h3>
+                        <p>{{order.product.description}}</p>
+                        <p>Price: ${{order.product.price}}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr>
+                        <h2>Update Order</h2><hr><br>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                                <p style="display: none;">{{form.product|add_class:'form-control'}}</p>
+                                <p>{{form.status|add_class:'form-control'}}</p>
+                            <hr>
+                            <input class="btn btn-primary" type="submit" name="Submit">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md">
+            
         </div>
     </div>
 </div>

@@ -28,7 +28,7 @@
         transform: translate(-50%, -50%);
     }
     
-    .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12{
+    .col-lg-3, .col-lg-6, .col-lg-8, .col-lg-12{
         margin-top: 10px;
     }
     .item-details .item-center{ 
@@ -103,6 +103,10 @@
         display: inline-block;
         margin-right: 20px;
     }
+    .product-img img{
+      display: block;
+      margin: auto;
+    }
     #myInput {
         background-image: url("{% static '/images/searchicon.png' %}"); 
         background-position: 10px 12px; 
@@ -124,14 +128,15 @@
         border: 1px solid #ddd; 
     }
     .box-element{
-        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
         background-color: #fff;
         border-radius: 4px;
         padding: 10px;
     }
     .thumbnail{
-        width: 100%;
+        display: block;
+        margin: auto;
         height: 200px;
+        background-color: #fff;
         -webkit-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
           -moz-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
           box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
@@ -139,6 +144,12 @@
 
     .product{
         border-radius: 0 0 4px 4px;
+    }
+    #footer{
+      display: none;
+    }
+    #footer-user{
+      display: block !important;
     }
 </style>
 <script>
@@ -197,19 +208,17 @@
       <div class="carousel-item">
           <div class="row">
               <div class="col-md-5 product-img">
-                <img class="d-block w-100" src="{{ product.img.url }}" alt="Second slide">
+                <img src="{{ product.img.url }}" alt="Second slide">
               </div>
-              <div class="col-md-5 item-details">
+              <div class="col-md-7 item-details">
                   <div class="item-center">
                     <h3><i><b>{{ product.name }}</b></i></h3>
                     {% if product.description %}
-                    <p>{{ product.description }}</p>
+                    <p><strong>{{ product.description }}</strong></p>
                     {% endif %}
-                    <h4>Price: <i>BDT {{ product.price }}TK</i></h4>
+                    <h4>Price: ${{ product.price|floatformat:0 }}</h4>
+                    <button data-product={{product.id}} data-action="add" class="btn btn-sm btn-secondary add-btn update-cart">Add to Cart</button>
                   </div>
-              </div>
-              <div class="col-md-2 slider-btn">
-                  <button class="btn btn-md btn-info">Order Now</button>
               </div>
           </div>
         
@@ -234,7 +243,8 @@
 </div>
 <div class="row">
   {% for product in products %}
-  <div class="col-lg-4">
+  <div class="col-lg-3">
+    <div style="background-color: #fff;">
     <img class="thumbnail" src="{{ product.img.url }}" alt="">
     <div class="box-element product">
       <h6><strong>{{ product.name }}</strong></h6><hr>
@@ -243,6 +253,7 @@
       <h4 style="display: inline-block; float: right;">${{product.price|floatformat:0}}</h4>
     </div>
   </div>
+</div>
   {% endfor %}
 </div>
 {% endblock %}

@@ -1,13 +1,24 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import JsonResponse
 from accounts.models import *
 from .filters import ProductFilter
 import json
 import datetime
 from .models import *
+from django.contrib import messages
+from .forms import SubscribeForm
 
 # Create your views here.
 def store(request):
+    if request.method == 'POST':
+        form = SubscribeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Subscription Successful')
+            return redirect('/store')
+    else:
+        form = SubscribeForm()
+
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
@@ -18,15 +29,17 @@ def store(request):
         order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
         cartItems = order['get_cart_items']
     products = Product.objects.all()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
     productFilter = ProductFilter(request.GET,queryset=products)
     products = productFilter.qs
-    context = {'products':products,'cartItems':cartItems,'productFilter':productFilter}
+    context = {'total_subscriber':total_subscriber,'form':form,'products':products,'cartItems':cartItems,'productFilter':productFilter}
     return render(request, 'store/store.html',context)
 
 def cart(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False, status='Pending')
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
@@ -57,9 +70,9 @@ def updateItem(request):
 
     customer = request.user.customer
     product = Product.objects.get(id=productId)
-    order, created = Order.objects.get_or_create(customer=customer, complete=False, status='Pending')
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
 
-    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+    orderItem, created = OrderItem.objects.get_or_create(customer=customer,order=order, product=product, status='Pending')
 
     if action == 'add':
         orderItem.quantity = (orderItem.quantity + 1)
@@ -79,7 +92,7 @@ def processOrder(request):
 
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False, status='Pending')
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
         total = float(data['form']['total'])
         order.transaction_id = transaction_id
 
@@ -100,3 +113,4 @@ def processOrder(request):
     else:
         print('User is not logged in...')
     return JsonResponse('Payment complete!', safe=False)
+
