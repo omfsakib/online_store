@@ -11,7 +11,9 @@
 }
 
 .row-image{
-	width: 100px;
+    display: block;
+    margin: auto;
+    height: 80px;
 }
 
 .form-field{
@@ -37,6 +39,12 @@
 
 }
 
+#footer{
+    display: none;
+  }
+  #footer-user{
+    display: block !important;
+  }
 .box-element{
         box-shadow:hsl(0, 0%, 80%) 0 0 16px;
         background-color: #fff;
@@ -134,7 +142,6 @@
         </div>
     </div>
 </div>
-
 <script type="text/javascript">
     var shipping = '{{order.shipping}}'
     var total = '{{ order.get_cart_total|floatformat:2 }}'

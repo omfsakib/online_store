@@ -14,11 +14,15 @@
     .filter-form:last-child{
         width: 77px;
     }
+    
+#footer{
+    display: none;
+  }
+  #footer-user{
+    display: block !important;
+  }
 </style>
-<li class="nav-item">
-    <a class="nav-link" href="{% url 'create_order' user.customer.id %}">Order</a>
-</li>
-
+<br><br>
 <div class="row">
     <div class="col">
         <div class="card card-body" style="align-items: center;">
@@ -39,19 +43,19 @@
 <div class="row">
     <div class="col-md">
         <div class="card card-body">
-            <table class="table table-sm">
+            <table class="table table-sm paginated">
+                <thead>
                 <tr>
                     <th>Product</th>
-                    <th>Category</th>
                     <th>Date Ordered</th>
                     <th>Status</th>
                     <th>Delete</th>
                 </tr>
+            </thead>
                 {% for order in orders %}
                 <tr>
                     <th>{{order.product}}</th>
-                    <th>{{order.product.category}}</th>
-                    <th>{{order.date_created}}</th>
+                    <th>{{order.date_added}}</th>
                     <th>{{order.status}}</th>
                     <td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' order.id %}">Delete</a></td>
                 </tr>

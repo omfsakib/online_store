@@ -166,7 +166,18 @@ def home(request):
 
 @login_required(login_url='login')
 def userPage(request):
-    orders = request.user.customer.orderitem_set.all()
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+
+    orders = request.user.customer.orderitem_set.all().order_by('-date_added')
 
     total_orders = orders.count()
     delivered = orders.filter(status='Delivered').count()
@@ -175,21 +186,43 @@ def userPage(request):
     myFilter = OrderFilter(request.GET,queryset=orders)
     orders = myFilter.qs
 
-    context = {'orders':orders,'total_orders':total_orders,
+    context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'orders':orders,'total_orders':total_orders,'cartItems':cartItems,
     'delivered':delivered,'pending':pending,'myFilter':myFilter}
     return render(request, 'accounts/user.html', context)
 
 @login_required(login_url='login')
 def viewAccount(request, pk = None):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+
     if pk:
         user = User.objects.get(pk=pk)
     else:
         user = request.user
-    args = {'user':user}
+    args = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems,'user':user}
     return render(request,'accounts/account.html',args)
 
 @login_required(login_url='login')
 def accountSettings(request):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+
     group = Group.objects.get(name = 'customer')
     print(group)
     try: 
@@ -209,7 +242,7 @@ def accountSettings(request):
             form.save()
             form2.save()
             return redirect('/account')
-    context = {'form':form,'form2':form2}
+    context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'form':form,'cartItems':cartItems,'form2':form2}
     return render(request,'accounts/account_settings.html',context)
 
 @login_required(login_url='login')

@@ -6,9 +6,13 @@ import json
 import datetime
 from .models import *
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 from .forms import SubscribeForm
 
 # Create your views here.
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def store(request):
     if request.method == 'POST':
         form = SubscribeForm(request.POST)
@@ -29,14 +33,22 @@ def store(request):
         order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
         cartItems = order['get_cart_items']
     products = Product.objects.all()
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
     subscribers = Subscriber.objects.all()
     total_subscriber = subscribers.count()
     productFilter = ProductFilter(request.GET,queryset=products)
     products = productFilter.qs
-    context = {'total_subscriber':total_subscriber,'form':form,'products':products,'cartItems':cartItems,'productFilter':productFilter}
+    context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'form':form,'products':products,'cartItems':cartItems,'productFilter':productFilter}
     return render(request, 'store/store.html',context)
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def cart(request):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
@@ -45,10 +57,16 @@ def cart(request):
     else:
         items = []
         order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
-    context = {'items':items,'cartItems':cartItems,'order':order}
+    context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'items':items,'cartItems':cartItems,'order':order}
     return render(request, 'store/cart.html',context)
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def checkout(request):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
@@ -57,9 +75,11 @@ def checkout(request):
     else:
         items = []
         order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
-    context = {'items':items,'order':order,'cartItems':cartItems}
+    context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'items':items,'order':order,'cartItems':cartItems}
     return render(request, 'store/checkout.html',context)
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def updateItem(request):
     data = json.loads(request.body)
     productId = data['productID']
@@ -78,6 +98,8 @@ def updateItem(request):
         orderItem.quantity = (orderItem.quantity + 1)
     elif action == 'remove':
         orderItem.quantity = (orderItem.quantity - 1)
+    elif action == 'delete':
+        orderItem.quantity = 0
 
     orderItem.save()
 
