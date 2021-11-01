@@ -13,6 +13,7 @@ urlpatterns = [
     path('user/dashboard/',views.userPage,name='user-page'),
     path('account/',views.viewAccount,name='account'),
     path('account/edit/',views.accountSettings,name='edit_account'),
+    path('change-password/',views.change_password,name = 'change_password'),
     path('', views.home,name='home'),
     path('products/', views.products,name='products'),
     path('customer/<str:pk>/', views.customers,name='customer'),

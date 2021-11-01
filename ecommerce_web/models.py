@@ -48,3 +48,13 @@ class MailMessage(models.Model):
 
     def __str__(self):
         return self.title
+    
+class Review(models.Model):
+    user = models.ForeignKey(Customer, models.CASCADE)
+    product = models.ForeignKey(Product, models.CASCADE)
+    comment = models.TextField(max_length=250)
+    rate = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.id)

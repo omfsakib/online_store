@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect
+from django.contrib.auth import update_session_auth_hash
+from django.urls import reverse
 from django.http import JsonResponse
 from accounts.models import *
 from .filters import ProductFilter
@@ -8,7 +10,7 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import allowed_users
-from .forms import SubscribeForm
+from .forms import SubscribeForm,ReviewForm
 
 # Create your views here.
 @login_required(login_url='login')
@@ -136,3 +138,47 @@ def processOrder(request):
         print('User is not logged in...')
     return JsonResponse('Payment complete!', safe=False)
 
+def productView(request,pk):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    product = Product.objects.get(id = pk)
+
+    review = product.review_set.all()
+    total_review = review.count()
+    total_rate = 0
+    for i in review:
+        total_rate += i.rate
+    try:
+        avg_rating = total_rate/total_review
+    except:
+        avg_rating = 0
+    form = ReviewForm()
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        form.save()
+        messages.success(request, 'Review Added')
+        return redirect(reverse('view', kwargs={'pk':pk}))
+    
+    else:
+        form = ReviewForm()
+
+    context = {'avg_rating':avg_rating,'review':review,'total_review':total_review,'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    return render(request, "store/view.html",context)
+
+@login_required(login_url='login')
+def deleteReview(request, pk):
+    review = Review.objects.get(id=pk)
+    if request.method == "POST":
+        review.delete()
+        return redirect('/')
+
+    context = {'item':review}
+    return render(request,'store/delete.html',context)

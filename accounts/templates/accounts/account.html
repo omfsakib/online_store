@@ -19,12 +19,11 @@
 </style>
 
 <br>
+<div class="container">
 <div class="row">
     <div class="col-md-3">
         <div class="card card-body">
             <a href="{% url 'home' %}" class="btn btn-warning">&#8592; Back to Home</a>
-            <hr>
-            <h3 style="text-align: center;">Account Settings</h3>
             <hr>
             <img src="{{ request.user.customer.profile_pic.url }}" class="profile-pic">
             <img src="{{ request.user.shopowner.profile_pic.url }}" class="profile-pic">
@@ -41,10 +40,10 @@
             {% endif %}
             <div class="profile_btn">
                 <a href="{% url 'edit_account' %}" class="btn btn-info" role="button">Edit Profile</a>
-                <a href="#" class="btn btn-primary" role="button">Change Password</a>
+                <a href="{% url 'change_password' %}" class="btn btn-primary" role="button">Change Password</a>
             </div>
         </div>
     </div>
 </div>
-
+</div>
 {% endblock %}

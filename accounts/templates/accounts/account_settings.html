@@ -25,12 +25,13 @@
 </style>
 
 <br>
+<div class="container">
 <div class="row">
     <div class="col-md-3">
         <div class="card card-body">
             <a href="{% url 'account' %}" class="btn btn-warning">&#8592; Back to Profile</a>
             <hr>
-            <h3 style="text-align: center;">Account Settings</h3>
+            <h5 style="text-align: center;">Account Settings</h5>
             <hr>
             <img src="{{ request.user.customer.profile_pic.url }}" class="profile-pic">
             <img src="{{ request.user.shopowner.profile_pic.url }}" class="profile-pic">
@@ -61,5 +62,5 @@ Change:
         </div>
     </div>
 </div>
-
+</div>
 {% endblock %}

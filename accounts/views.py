@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from .decorators import unauthenticted_user, allowed_users,shopowner_only
+from django.contrib.auth.forms import PasswordChangeForm
 
 # Create your views here.
 
@@ -244,6 +245,33 @@ def accountSettings(request):
             return redirect('/account')
     context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'form':form,'cartItems':cartItems,'form2':form2}
     return render(request,'accounts/account_settings.html',context)
+
+@login_required(login_url='login')
+def change_password(request):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)
+
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            return redirect(reverse('accouns:view_profile'))
+        else:
+            return redirect(reverse('accounts:change_password'))
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+        args = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems,'form': form}
+        return render(request, 'accounts/change_password.html', args)
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
