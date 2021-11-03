@@ -1,0 +1,100 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+    
+.dropdown-menu ul li{
+    list-style: none;
+}
+.dropdown{
+    display: inline-block;
+    margin-right: 20px;
+}
+.card input,textarea{
+    margin-top: 5px;
+}
+.card textarea{
+    height: 100px;
+}
+.card .dropdown{
+    display: block;
+    margin-top: 5px;
+}
+</style>
+<script>
+    function categoryFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById('categoryInput');
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("id_category");
+    li = ul.getElementsByTagName('li');
+  
+    for (i = 0; i < li.length; i++) {
+      a = li[i].getElementsByTagName("label")[0];
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+
+  
+  function tagFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById('tagInput');
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("id_tags");
+    li = ul.getElementsByTagName('li');
+  
+    for (i = 0; i < li.length; i++) {
+      a = li[i].getElementsByTagName("label")[0];
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="card card-body">
+                <form method="POST" action="{% url 'product_setting' product.id %}" enctype='multipart/form-data'>
+                    {% csrf_token %}
+                    {{form.name|add_class:'form-control'}}
+                    {{form.price|add_class:'form-control'}}
+                    {{form.description|add_class:'form-control'}}
+                    {{form.img|add_class:'form-control'}}
+                    {{form.discount|add_class:'form-control'}}
+                    <div class="dropdown filter-form">
+                        <button style="width: 100%;" class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Select Category
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <input class="form-control" type="text" id="categoryInput" onkeyup="categoryFunction()" placeholder="Search tags">
+                            {{ form.category }}
+                        </div>
+                      </div>
+                      <div class="dropdown filter-form">
+                          <button style="width: 100%;" class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Select Tags
+                          </button>
+                          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <input class="form-control" type="text" id="tagInput" onkeyup="tagFunction()" placeholder="Search tags">
+                              {{ form.tags }}
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-success">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock %}

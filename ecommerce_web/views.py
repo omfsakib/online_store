@@ -6,6 +6,8 @@ from accounts.models import *
 from .filters import ProductFilter
 import json
 import datetime
+from django.utils import timezone
+from datetime import timedelta
 from .models import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -34,14 +36,29 @@ def store(request):
         items = []
         order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
         cartItems = order['get_cart_items']
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('-date_created')
+    date = timezone.now().date() - timedelta(days=7)
+    product_week = Product.objects.filter(date_created__gt=(datetime.datetime.now()- timedelta(days=7))).order_by('-date_created')
     shops = ShopOwner.objects.all().count()
     customers = Customer.objects.all().count()
     subscribers = Subscriber.objects.all()
     total_subscriber = subscribers.count()
+    total_products = products.count()
     productFilter = ProductFilter(request.GET,queryset=products)
+    top_reviewed = Review.objects.all().order_by('rate')
     products = productFilter.qs
-    context = {'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'form':form,'products':products,'cartItems':cartItems,'productFilter':productFilter}
+    context = {
+    'total_products':total_products,
+    'top_reviewed':top_reviewed,
+    'product_week':product_week,
+    'customers':customers,
+    'shops':shops,
+    'total_subscriber':total_subscriber,
+    'form':form,
+    'products':products,
+    'cartItems':cartItems,
+    'productFilter':productFilter
+    }
     return render(request, 'store/store.html',context)
 
 @login_required(login_url='login')
@@ -94,7 +111,7 @@ def updateItem(request):
     product = Product.objects.get(id=productId)
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
 
-    orderItem, created = OrderItem.objects.get_or_create(customer=customer,order=order, product=product, status='Pending')
+    orderItem, created = OrderItem.objects.get_or_create(customer=customer, order=order, product=product, status='Pending')
 
     if action == 'add':
         orderItem.quantity = (orderItem.quantity + 1)
@@ -122,7 +139,7 @@ def processOrder(request):
 
         if total == order.get_cart_total:
             order.complete = True
-        order.save()
+            order.save()
 
         if order.shipping == True:
             ShippingAddress.objects.create(
@@ -170,7 +187,8 @@ def productView(request,pk):
     else:
         form = ReviewForm()
 
-    context = {'avg_rating':avg_rating,'review':review,'total_review':total_review,'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    stock = product.stock
+    context = {'stock':stock,'avg_rating':avg_rating,'review':review,'total_review':total_review,'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
     return render(request, "store/view.html",context)
 
 @login_required(login_url='login')

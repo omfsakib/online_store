@@ -49,11 +49,13 @@
         {% endif %}
       </ul>
     </div>
+    {% if not request.user.is_staff %}
     <div class="form-inline my-2 my-lg-0">
       <a href="{% url 'cart' %}"><img src="{% static 'images/cart.png' %}" alt="" id="cart-icon"></a>
       <p id="cart-total">{{cartItems}}</p>
 
     </div>
+    {% endif %}
     <span class="hello-msg">Hello, {{request.user}}</span>
     <span ><a class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
   </nav>

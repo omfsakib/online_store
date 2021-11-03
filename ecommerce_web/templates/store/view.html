@@ -53,12 +53,13 @@
     margin-top: 20px;
   }
   .view_left{
-    height: 573px;
+    height: 630px;
   }
   .view_left img{
     display: block;
     margin: auto;
-    height: 450px;
+    max-width: 510px;
+    max-height: 480px;
   }
   .view_left_down{
     margin-top: 20px;
@@ -77,7 +78,10 @@
     font-size: 25px;
     text-align: center;
   }
-
+#id_tags{
+  height: 200px !important;
+  overflow: auto;
+}
   .active, .collapsible:hover {
     background-color: #dfdfdf;
   }
@@ -93,19 +97,25 @@
   button:focus {
     outline: none !important;
 }
+.view_left img{
+  transition: transform .2s; /* Animation */
+}
+.view_left img:hover {
+  transform: scale(1.5);
+  z-index: 99999; /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+}
 .checked {
   color: #ffc107;
 }
 </style>
 {% endblock %}
 {% block content %}
-<br>
-<a href="{% url 'store' %}" class="btn btn-outline-info btn-md">Continue Shopping</a>
 <div class="container">
   <div class="row view">
     <div class="col-md-6">
       <div class="card card-body view_left">
-        <img src="{{product.img.url}}" alt="">
+        <a href="{% url 'store' %}" class="btn btn-outline-info btn-md" style="width: 40%;">&#x2190; Continue Shopping</a>
+        <img src="{{product.img.url}}" >
       </div>
     </div>
     <div class="col-md-6">
@@ -114,9 +124,18 @@
           <div class="card card-body">
             <h3>{{product.name}}</h3>
             <h5>{{product.description}}</h5>
+            {% if product.discount >= 0 %}
+            <h5>Discount: {{product.discount}}%</h5>
+            {% endif %}
             <h5>Price: ${{product.price}}</h5>
-            <h5>Rating:	{{avg_rating|floatformat:1}}&#9733;</h5> <br>
-            <button style="width: 150px;" data-product={{product.id}} data-action="add" class="btn btn-secondary add-btn update-cart">Add to Cart</button>
+            <h5>Rating:	{{avg_rating|floatformat:1}}&#9733;</h5>
+            {% if stock <= 0 %}
+            <h5>Available: <p style="color: red; display: inline-block;">Out of stock</p></h5>
+            <button class="btn btn-outline-danger btn-disabled">Add to Cart</button>
+            {% else %}
+            <h5>Available: <p style="color: green; display: inline-block;">In stock</p></h5>
+            <button data-product={{product.id}} data-action="add" class="btn btn-outline-success add-btn update-cart">Add to Cart</button>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -150,7 +169,7 @@
         <button type="button" class="collapsible">{{total_review}} REVIEWS</button>
         <div class="content">
           {% for i in review %}
-          <p>Review by: {{i.user}}</p>
+          <p>Reviewed by: {{i.user}}</p>
           <p>{{i.comment}}</p>
             <p class="star_review">
               {% if i.rate == 1 %}

@@ -2,13 +2,13 @@
     margin-top: 15px;
 }
 .carousel{
-    background-color: beige;
-    border: 1px solid beige;
+    background-color: #5bc9da;
+    border: 1px solid #5bc9da;
     border-radius: 25px;
 }
 .product-img img{
     height: 250px;
-    border: 1px solid aquamarine;
+    border: 1px solid ;
     border-radius: 15px;
 }
 .slider-btn{

@@ -1,0 +1,21 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="card card-body">
+                <h3 style="text-align: center;">Add Stock</h3>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <input placeholder="add recent stock..." style="width: 400px;float: left;margin-right: 20px;" type="number" name='stock' class="form-control">
+                    <input type="submit" class="btn btn-outline-success">
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 {% extends 'accounts/main.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% block content %}
+{% block head %}
 <style>
     .product-form{
         width: 170px;
@@ -28,7 +28,15 @@
         margin-top: -10px;
     }
 </style>
-<script>
+<script>    
+$(document).ready(function(){
+    $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#myTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    });
     function myFunction() {
       var input, filter, ul, li, a, i, txtValue;
       input = document.getElementById('myInput');
@@ -64,6 +72,9 @@
       }
     }
     </script>
+{%endblock%}
+{% block content %}
+
     <br>
 
     <div class="row">
@@ -75,13 +86,24 @@
                 <form action="" method="POST">
                     {% csrf_token %}
                     <p class="product-form">
+                        <label for="id_name"></label>
                         {{ form.name|add_class:'form-control' }}
                     </p>
                     <p class="product-form">
+                        <label for="id_img"></label>
                         {{ form.img|add_class:'form-control' }}
                     </p>
                     <p class="product-form">
+                        <label for="id_price"></label>
                         {{ form.price|add_class:'form-control' }}
+                    </p>
+                    <p class="product-form">
+                        <label for="id_stock">In Stock : </label>
+                        {{ form.stock|add_class:'form-control' }}
+                    </p>
+                    <p class="product-form">
+                        <label for="id_discount">Discount : </label>
+                        {{ form.discount|add_class:'form-control' }}
                     </p>
                         <div class="dropdown">
                             <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -108,20 +130,40 @@
                 </form>
             </div>
             <div class="card card-body">
-                <table class="table">
-                    <tr>
-                        <th>Product</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                    </tr>
+                <input id="myInput" class="form-control" type="text" placeholder="Search..">
+                <br><br>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Remove <br> discount</th>
+                            <th>Update</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
                     {% for i in products %}
                         <tr>
+                            <td><img src="{{ i.img.url }}" alt="Product Img" style="height: 50px;"></td>
                             <td>{{ i.name }}</td>
-                            <td>{{ i.category }}</td>
-                            <td>{{ i.price }}</td>
+                            <td>{{ i.description }}</td>
+                            <td>{{ i.price|floatformat:2 }}</td>
+                            <td>{{ i.stock }}   <a href="{% url 'update_stock' i.id %}" class="btn btn-outline-success">Add</a>
+                            </td>
+                            <td><form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{i.id}}">
+                                <input type="submit" class="btn btn-outline-danger" name="discount_amount" value="{{i.discount_amount|floatformat:2}}">
+                            </form></td>
+                            <td><a class="btn btn-sm btn-info" href="{% url 'product_setting' i.id %}">Update</a></td>
+                            <td><a class="btn btn-sm btn-danger" href="#">Delete</a></td>
                         </tr>
-                        
                     {% endfor %}
+                </tbody>
                 </table>
             </div>
         </div>

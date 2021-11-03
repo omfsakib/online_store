@@ -3,8 +3,214 @@
 {% load widget_tweaks %}
 {% block head %}
     
-  <link rel="stylesheet" type="text/css" href="{% static '/css/store.css' %}">
+  <style>
+    .container-fluid{
+    margin-top: 15px;
+}
+.carousel{
+    background-image: url("{% static '/images/s3.jpg' %}"); 
+    border: 1px solid #5bc9da;
+    border-radius: 25px;
+    height: 253px;
+}
+.product-img img{
+    max-height: 250px;
+    max-width: 350px;
+    border-radius: 15px;
+}
+.slider-btn{
+    border-radius: 15px;
+    margin-left: -50px;
+}
+.slider-btn button{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
+.col-lg-3, .col-lg-6, .col-lg-8, .col-lg-12{
+    margin-top: 10px;
+}
+.item-details .item-center{ 
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translate(-10%, -50%);
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: black;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+.carousel-control-next-icon{
+  margin-left: 50px;
+}
+.carousel-control-prev-icon{
+  margin-left: -50px;
+}
+.col{
+  float: left;
+  width: 250px;
+  height: 400px;
+  border: 1px solid aquamarine;
+  border-radius: 15px;
+  margin-right: 10px;
+  margin-top: 50px;
+  margin-bottom: 100px;
+  background-color: #fff;
+}
+.col .col-img{
+  margin-top: 20px;
+}
+.col .col-img img{
+  height: 150px;
+}
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.col .col-details{
+  margin-top: 20px;
+}
+.col-btn .btn{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  bottom: 5%;
+  left: 30%;
+  right: 30%;
+}
+.store-mid{
+  margin-top: 50px;
+}
+.store-mid .mid-btn{
+  text-align: center;
+}
+.filter-form{
+    width: 170px;
+    float: left;
+    display: inline-block;
+    margin-right: 20px;
+}
+.dropdown-menu ul li{
+    list-style: none;
+}
+.dropdown{
+    display: inline-block;
+    margin-right: 20px;
+}
+.product-img img{
+  display: block;
+  margin: auto;
+}
+#myInput {
+    background-image: url("{% static '/images/searchicon.png' %}"); 
+    background-position: 10px 12px; 
+    background-repeat: no-repeat; 
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd; 
+    margin-bottom: 12px;
+    margin-top: -10px;
+}
+#searchInput{
+  background-image: url("{% static '/images/searchicon.png' %}"); 
+    background-position: 10px 10px; 
+    background-repeat: no-repeat; 
+    width: 92%;
+    font-size: 16px;
+    padding: 10px 20px 10px 40px;
+    border: 1px solid #ddd; 
+    margin-bottom: 10px;
+}
+.box-element{
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 10px;
+}
+.thumbnail{
+    display: block;
+    margin: auto;
+    height: 200px;
+    max-width: 300px;
+    background-color: #fff;
+}
+
+.product{
+    border-radius: 0 0 4px 4px;
+}
+#footer{
+  display: none;
+}
+#footer-user{
+  display: block !important;
+}
+#liveInput{
+  float: left;
+  width: 70%;
+}
+
+  </style>
+<script>
+  $(function() {
+    $('div.paginated').each(function() {
+      var currentPage = 0;
+      var numPerPage = 8;
+      var $table = $(this);
+      $table.bind('repaginate', function() {
+        $table.find('.col-lg-3').hide().slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+      });
+      $table.trigger('repaginate');
+      var numRows = $table.find('.col-lg-3').length;
+      var numPages = Math.ceil(numRows / numPerPage);
+      var $pager = $('<div class="pager"></div>');
+      var $previous = $('<span class="previous"><<</spnan>');
+      var $next = $('<span class="next">>></spnan>');
+      for (var page = 0; page < numPages; page++) {
+        $('<span class="page-number"></span>').text(page + 1).bind('click', {
+          newPage: page
+        }, function(event) {
+          currentPage = event.data['newPage'];
+          $table.trigger('repaginate');
+          $(this).addClass('active').siblings().removeClass('active');
+        }).appendTo($pager).addClass('clickable');
+      }
+      $pager.insertAfter($table).find('span.page-number:first').addClass('active');
+      $previous.insertBefore('span.page-number:first');
+      $next.insertAfter('span.page-number:last');
+  
+      $next.click(function(e) {
+        $previous.addClass('clickable');
+        $pager.find('.active').next('.page-number.clickable').click();
+      });
+      $previous.click(function(e) {
+        $next.addClass('clickable');
+        $pager.find('.active').prev('.page-number.clickable').click();
+      });
+      $table.on('repaginate', function() {
+        $next.addClass('clickable');
+        $previous.addClass('clickable');
+  
+        setTimeout(function() {
+          var $active = $pager.find('.page-number.active');
+          if ($active.next('.page-number.clickable').length === 0) {
+            $next.removeClass('clickable');
+          } else if ($active.prev('.page-number.clickable').length === 0) {
+            $previous.removeClass('clickable');
+          }
+        });
+      });
+      $table.trigger('repaginate');
+    });
+  });
+</script>
 {% endblock %}
 {% block content %}
 <div class="row">
@@ -39,7 +245,7 @@
   <div class="col-md-6"><div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel"> 
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img class="d-block w-100" style="height: 250px;" src="" alt="First slide">
+        <img class="d-block w-100" style="height: 250px; border-radius: 25px;" src="{% static 'images/corosellex1.jpg' %}" alt="First slide">
       </div>
       {% for product in products %}
       <div class="carousel-item">
@@ -54,7 +260,13 @@
                     <p><strong>{{ product.description }}</strong></p>
                     {% endif %}
                     <h4>Price: ${{ product.price|floatformat:0 }}</h4>
+                    {% if product.stock <= 0 %}
+                    <p>Available: <strong style="color: red;">Out of stock</strong> </p>
+                    <button class="btn btn-disabled btn-sm btn-outline-danger">Add to Cart</button>
+                    {% else %}
+                    <p>Available: <strong style="color: green;">In stock</strong> </p>
                     <button data-product={{product.id}} data-action="add" class="btn btn-sm btn-secondary add-btn update-cart">Add to Cart</button>
+                    {% endif %}
                   </div>
               </div>
           </div>
@@ -76,16 +288,38 @@
       <p><input class="form-control" type="text" id="liveInput" onkeyup="productFunction()" placeholder="Search product...."> 
         <button class="btn btn-info" style="margin-left: 15px;" type="submit">Search</button></p>
     </form>
+    <p>Product added in last 7 days: </p>
+    <div class="product_week" style="height: 45px; overflow: auto;">
+      {% for i in product_week %}
+      <a href="{% url 'view' i.id %}" class="btn btn-outline-info" style="margin-top: 5px;">{{i.name}}</a>
+      {% endfor %}
+    </div><br>
+    <p>Top Reviewed Product: </p>
+    <div class="top_reviewed" style="height: 45px; overflow: auto;">
+      {% for i in top_reviewed %}
+      {% if i.rate >= 3 %}
+      <a href="{% url 'view' i.product.id %}" class="btn btn-outline-info" style="margin-top: 5px;"><strong>{{i.product.name}}</strong>: {{i.rate|floatformat:1}}&#9733;</a>
+      {% endif %}
+      {% endfor %}
+    </div>
   </div>
 </div>
+{% if total_products > 8 %}
+<div class="row paginated" id="product_name">
+{% else %}
 <div class="row" id="product_name">
+{% endif %}
   {% for product in products %}
   <div class="col-lg-3">
     <div style="background-color: #fff;">
     <img class="thumbnail" src="{{ product.img.url }}" alt="">
     <div class="box-element product">
       <h6><strong>{{ product.name }}</strong></h6><hr>
-      <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+      {% if product.stock <= 0 %}
+      <button class="btn btn-disabled btn-outline-danger">Out of Stock</button>
+      {% else %}
+      <button data-product={{product.id}} data-action="add" class="btn btn-outline-success add-btn update-cart">Add to Cart</button>
+      {% endif %}
       <a href="{% url 'view' product.id %}" class="btn btn-outline-success">View</a>
       <h4 style="display: inline-block; float: right;">${{product.price|floatformat:0}}</h4>
     </div>

@@ -197,13 +197,15 @@ def viewAccount(request, pk = None):
     customers = Customer.objects.all().count()
     subscribers = Subscriber.objects.all()
     total_subscriber = subscribers.count()
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        cartItems = order.get_cart_items
-    else:
-        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
-
+    try:
+        if request.user.is_authenticated:
+            customer = request.user.customer
+            order, created = Order.objects.get_or_create(customer=customer, complete=False)
+            cartItems = order.get_cart_items
+        else:
+            order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    except:
+        cartItems = 0
     if pk:
         user = User.objects.get(pk=pk)
     else:
@@ -217,12 +219,15 @@ def accountSettings(request):
     customers = Customer.objects.all().count()
     subscribers = Subscriber.objects.all()
     total_subscriber = subscribers.count()
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        cartItems = order.get_cart_items
-    else:
-        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    try:
+        if request.user.is_authenticated:
+            customer = request.user.customer
+            order, created = Order.objects.get_or_create(customer=customer, complete=False)
+            cartItems = order.get_cart_items
+        else:
+            order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    except:
+        cartItems = 0
 
     group = Group.objects.get(name = 'customer')
     print(group)
@@ -277,14 +282,76 @@ def change_password(request):
 @allowed_users(allowed_roles=['shopowner'])
 def products(request):
     form = ProductForm()
+    emails = Subscriber.objects.all()
+    df = read_frame(emails, fieldnames=['email'])
+    mail_list = df['email'].values.tolist()
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        productID = request.POST.get('id')
+        product = Product.objects.get(id=productID)
+        discount = float(request.POST.get('discount_amount'))
+        product.price += discount
+        product.discount_amount = 0
+        product.discount = 0
+        product.save()
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            name = form.cleaned_data.get('name')
+            price = form.cleaned_data.get('price')
+            description = form.cleaned_data.get('description')
+            stock = form.cleaned_data.get('stock')
+            send_mail(
+                'New product added on Online Store go check it out...',
+                f'''Hello there! 
+                Online Store just added a new product.
+                Name: {name}
+                Price: ${price}
+                Description: {description}
+                Only {stock} of this product is available. 
+                Hurry up!
+                http://127.0.0.1:8000/store''',
+                '',
+                mail_list,
+                fail_silently=False
+            )
+            return redirect('/products')
+            
     products = Product.objects.all()
 
     context ={'products':products,'form':form}
     return render(request,'accounts/products.html',context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['shopowner'])
+def updateStock(request,pk):
+    product = Product.objects.get(id=pk)
+    if request.method == 'POST':
+        stock = request.POST.get('stock')
+        product.stock = int(product.stock) + int(stock)
+        product.save()
+        return redirect('/products')
+
+    return render(request, 'accounts/stock.html')
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['shopowner'])
+def productSetting(request,pk):
+    product = Product.objects.get(id=pk)
+    form = ProductForm(instance=product)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            discount = form.cleaned_data.get('discount')
+            product.discount_amount = product.price*(discount/100)
+            product.price -= product.discount_amount
+            product.save()
+            return redirect('/products')
+        else:
+            form = ProductForm(request.POST, request.FILES, instance=product)
+
+    context = {'product':product,'form':form}
+    return render(request,'accounts/productsetting.html',context)
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
@@ -299,31 +366,18 @@ def customers(request, pk):
     return render(request,'accounts/customer.html',context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['customer'])
-def createorder(request,pk):
-    OrderFormSet =inlineformset_factory(Customer, Order, fields=('product','status'),extra=10)
-    customer = Customer.objects.get(id=pk)
-    formset = OrderFormSet()
-    #form = OrderForm(initial={'customer':customer})
-    if request.method =='POST':
-        #form = OrderForm(request.POST)
-        formset = OrderFormSet(request.POST,instance=customer)
-        if formset.is_valid():
-            formset.save()
-            return redirect('/')
-
-    context = {'formset':formset}
-    return render(request,'accounts/order_form.html',context)
-
-@login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
 def updateOrder(request,pk):
     order = OrderItem.objects.get(id=pk)
+    
     form = UpdateOrderForm(instance=order)
     if request.method =='POST':
         form = UpdateOrderForm(request.POST,instance=order)
         if form.is_valid():
             form.save()
+            if order.status == 'Delivered':
+                order.product.stock -= 1
+                order.product.save()
             return redirect('/')
     context = {'form':form,'order':order}
     return render(request,'accounts/update_order.html',context)
