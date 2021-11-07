@@ -55,3 +55,13 @@ class UpdateProfileForm(UserChangeForm):
     class Meta:
         model = User
         fields =['email','first_name','last_name','password']
+    
+class TagForm(ModelForm):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+class CategoryForm(ModelForm):
+    class Meta:
+        model = Category
+        fields = '__all__'

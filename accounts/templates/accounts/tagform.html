@@ -1,0 +1,20 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="card card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text" class="form-control" name="name" placeholder="Enter new tag" maxlength="200" required="" id="id_name">
+                    <input style="margin-top: 20px;" type="submit" class="btn btn-success">
+                </form>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock %}

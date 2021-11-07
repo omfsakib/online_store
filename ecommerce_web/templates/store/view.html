@@ -124,10 +124,13 @@
           <div class="card card-body">
             <h3>{{product.name}}</h3>
             <h5>{{product.description}}</h5>
-            {% if product.discount >= 0 %}
+            {% if product.discount > 0 %}
             <h5>Discount: {{product.discount}}%</h5>
             {% endif %}
-            <h5>Price: ${{product.price}}</h5>
+            <h5>Price: {% if product.discount_amount > 0 %}
+              <del>${{demo_price|floatformat:2}}</del>
+              {% endif %}
+               ${{product.price|floatformat:2}}</h5>
             <h5>Rating:	{{avg_rating|floatformat:1}}&#9733;</h5>
             {% if stock <= 0 %}
             <h5>Available: <p style="color: red; display: inline-block;">Out of stock</p></h5>

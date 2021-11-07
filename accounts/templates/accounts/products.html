@@ -28,18 +28,10 @@
         margin-top: -10px;
     }
 </style>
-<script>    
-$(document).ready(function(){
-    $("#myInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#myTable tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
-    });
-    function myFunction() {
+<script>
+    function tagFunction() {
       var input, filter, ul, li, a, i, txtValue;
-      input = document.getElementById('myInput');
+      input = document.getElementById('tagInput');
       filter = input.value.toUpperCase();
       ul = document.getElementById("id_tags");
       li = ul.getElementsByTagName('li');
@@ -54,15 +46,32 @@ $(document).ready(function(){
         }
       }
     }
-    function myFunction() {
+    function categoryFunction() {
       var input, filter, ul, li, a, i, txtValue;
-      input = document.getElementById('myInput');
+      input = document.getElementById('categoryInput');
       filter = input.value.toUpperCase();
       ul = document.getElementById("id_category");
       li = ul.getElementsByTagName('li');
     
       for (i = 0; i < li.length; i++) {
         a = li[i].getElementsByTagName("label")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
+        }
+      }
+    }
+    function searchFunction() {
+      var input, filter, ul, li, a, i, txtValue;
+      input = document.getElementById('searchInput');
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("myTable");
+      li = ul.getElementsByTagName('tr');
+    
+      for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("td")[0];
         txtValue = a.textContent || a.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
           li[i].style.display = "";
@@ -110,7 +119,7 @@ $(document).ready(function(){
                               Select Category
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search tags">
+                                <input class="form-control" type="text" id="categoryInput" onkeyup="categoryFunction()" placeholder="Search tags">
                                 {{form.category}}
                             </div>
                           </div>
@@ -122,7 +131,7 @@ $(document).ready(function(){
                               Select Tags
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search tags">
+                                <input class="form-control" type="text" id="tagInput" onkeyup="tagFunction()" placeholder="Search tags">
                                 {{form.tags}}
                             </div>
                           </div>
@@ -130,9 +139,14 @@ $(document).ready(function(){
                 </form>
             </div>
             <div class="card card-body">
-                <input id="myInput" class="form-control" type="text" placeholder="Search..">
+                <div class="buttons">
+                    <a href="{% url 'tag' %}" style="width: 200px;" class="btn btn-outline-info">Create Tag</a>
+                    <a href="{% url 'category' %}" style="width: 200px;" class="btn btn-outline-info">Create Catgory</a></div>
+            </div>
+            <div class="card card-body">
+                <input id="myInput" class="form-control" onkeyup="searchFunction()" type="text" placeholder="Search..">
                 <br><br>
-                <table>
+                <table class="table table-sm paginated">
                     <thead>
                         <tr>
                             <th>Image</th>

@@ -22,4 +22,6 @@ urlpatterns = [
     path('update_stock/<str:pk>/',views.updateStock,name='update_stock'),
     path('delete_order/<str:pk>/',views.deleteOrder,name='delete_order'),
     path('mail',views.mail_letter,name='mail'),
+    path('create/tag/',views.createTag,name='tag'),
+    path('create/category/',views.createCategory,name='category'),
 ]

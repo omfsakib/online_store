@@ -250,10 +250,10 @@
       {% for product in products %}
       <div class="carousel-item">
           <div class="row">
-              <div class="col-md-5 product-img">
+              <div class="col-md-5 product-img" style="margin-left: 50px;">
                 <img src="{{ product.img.url }}" alt="Second slide">
               </div>
-              <div class="col-md-7 item-details">
+              <div class="col-md-6 item-details">
                   <div class="item-center">
                     <h3><i><b>{{ product.name }}</b></i></h3>
                     {% if product.description %}
@@ -321,7 +321,7 @@
       <button data-product={{product.id}} data-action="add" class="btn btn-outline-success add-btn update-cart">Add to Cart</button>
       {% endif %}
       <a href="{% url 'view' product.id %}" class="btn btn-outline-success">View</a>
-      <h4 style="display: inline-block; float: right;">${{product.price|floatformat:0}}</h4>
+      <h4 style="display: inline-block; float: right;"> ${{product.price|floatformat:0}}</h4>
     </div>
   </div>
 </div>

@@ -167,6 +167,7 @@ def productView(request,pk):
     else:
         order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
     product = Product.objects.get(id = pk)
+    demo_price = product.price + product.discount_amount
 
     review = product.review_set.all()
     total_review = review.count()
@@ -188,7 +189,7 @@ def productView(request,pk):
         form = ReviewForm()
 
     stock = product.stock
-    context = {'stock':stock,'avg_rating':avg_rating,'review':review,'total_review':total_review,'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    context = {'demo_price':demo_price,'stock':stock,'avg_rating':avg_rating,'review':review,'total_review':total_review,'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
     return render(request, "store/view.html",context)
 
 @login_required(login_url='login')

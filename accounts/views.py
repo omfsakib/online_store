@@ -285,41 +285,75 @@ def products(request):
     emails = Subscriber.objects.all()
     df = read_frame(emails, fieldnames=['email'])
     mail_list = df['email'].values.tolist()
-    if request.method == 'POST':
-        productID = request.POST.get('id')
-        product = Product.objects.get(id=productID)
-        discount = float(request.POST.get('discount_amount'))
-        product.price += discount
-        product.discount_amount = 0
-        product.discount = 0
-        product.save()
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            name = form.cleaned_data.get('name')
-            price = form.cleaned_data.get('price')
-            description = form.cleaned_data.get('description')
-            stock = form.cleaned_data.get('stock')
-            send_mail(
-                'New product added on Online Store go check it out...',
-                f'''Hello there! 
-                Online Store just added a new product.
-                Name: {name}
-                Price: ${price}
-                Description: {description}
-                Only {stock} of this product is available. 
-                Hurry up!
-                http://127.0.0.1:8000/store''',
-                '',
-                mail_list,
-                fail_silently=False
-            )
+    try:
+        if request.method == 'POST':
+            productID = request.POST.get('id')
+            product = Product.objects.get(id=productID)
+            discount = float(request.POST.get('discount_amount'))
+            product.price += discount
+            product.discount_amount = 0
+            product.discount = 0
+            product.save()
             return redirect('/products')
-            
+
+    except:
+        if request.method == 'POST':
+            form = ProductForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                name = form.cleaned_data.get('name')
+                price = form.cleaned_data.get('price')
+                description = form.cleaned_data.get('description')
+                stock = form.cleaned_data.get('stock')
+                send_mail(
+                    'New product added on Online Store go check it out...',
+                    f'''Hello there! 
+                    Online Store just added a new product.
+                    Name: {name}
+                    Price: ${price}
+                    Description: {description}
+                    Only {stock} of this product is available. 
+                    Hurry up!
+                    http://127.0.0.1:8000/store''',
+                    '',
+                    mail_list,
+                    fail_silently=False
+                )
+                return redirect('/products')
+                
     products = Product.objects.all()
 
     context ={'products':products,'form':form}
     return render(request,'accounts/products.html',context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['shopowner'])
+def createTag(request):
+    form = TagForm()
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/products')
+        else:
+            form = TagForm(request.POST)
+    context = {'form':form}
+    return render(request, 'accounts/tagform.html',context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['shopowner'])
+def createCategory(request):
+    form = CategoryForm()
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/products')
+        else:
+            form = CategoryForm(request.POST)
+    context = {'form':form}
+    return render(request, 'accounts/categoryform.html',context)
+        
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])

@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div style="flex:1"><p>${{item.get_total|floatformat:2}}</p></div>                
-                <div style="flex:1"><button data-product="{{item.product.id}}" class="btn btn-danger update-cart" data-action="remove"> Remove </button></div>
+                <div style="flex:1"><button data-product="{{item.product.id}}" class="btn btn-danger update-cart" data-action="delete"> Remove </button></div>
             </div>
             {% endfor %}
         </div>
