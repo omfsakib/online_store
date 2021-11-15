@@ -10,6 +10,7 @@ class OrderItem(models.Model):
     )
     customer = models.ForeignKey(Customer, null=True, on_delete= models.SET_NULL)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, blank=True, null=True)
+    shop = models.ForeignKey(ShopOwner, on_delete=models.SET_NULL, blank=True, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
     quantity = models.IntegerField(default=0,null=True,blank=True)
     date_added = models.DateTimeField(auto_now_add=True)

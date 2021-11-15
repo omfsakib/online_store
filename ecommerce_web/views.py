@@ -45,7 +45,7 @@ def store(request):
     total_subscriber = subscribers.count()
     total_products = products.count()
     productFilter = ProductFilter(request.GET,queryset=products)
-    top_reviewed = Review.objects.all().order_by('rate')
+    top_reviewed = Product.objects.all().order_by('rate')
     products = productFilter.qs
     context = {
     'total_products':total_products,
@@ -109,9 +109,10 @@ def updateItem(request):
 
     customer = request.user.customer
     product = Product.objects.get(id=productId)
+    shopowner = product.shopowner
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
 
-    orderItem, created = OrderItem.objects.get_or_create(customer=customer, order=order, product=product, status='Pending')
+    orderItem, created = OrderItem.objects.get_or_create(customer=customer, order=order, shop=shopowner, product=product, status='Pending')
 
     if action == 'add':
         orderItem.quantity = (orderItem.quantity + 1)
@@ -176,8 +177,12 @@ def productView(request,pk):
         total_rate += i.rate
     try:
         avg_rating = total_rate/total_review
+        product.rate = avg_rating
+        product.save()
     except:
         avg_rating = 0
+        product.rate = avg_rating
+        product.save()
     form = ReviewForm()
     if request.method == 'POST':
         form = ReviewForm(request.POST)
@@ -201,3 +206,38 @@ def deleteReview(request, pk):
 
     context = {'item':review}
     return render(request,'store/delete.html',context)
+
+@login_required(login_url='login')
+def shops(request):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    shopowner = ShopOwner.objects.all()
+
+    context = {'shopowner':shopowner,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    return render(request,'store/shops.html',context)
+
+@login_required(login_url='login')
+def view_shops(request,pk):
+    shops = ShopOwner.objects.all().count()
+    customers = Customer.objects.all().count()
+    subscribers = Subscriber.objects.all()
+    total_subscriber = subscribers.count()
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        cartItems = order.get_cart_items
+    else:
+        order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
+    shop = ShopOwner.objects.get(id=pk)
+    products = Product.objects.filter(shopowner=shop)
+    
+    context = {'products':products,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    return render(request,'store/view_shop.html',context)

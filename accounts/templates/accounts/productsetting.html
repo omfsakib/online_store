@@ -67,6 +67,7 @@
             <div class="card card-body">
                 <form method="POST" action="{% url 'product_setting' product.id %}" enctype='multipart/form-data'>
                     {% csrf_token %}
+                    <input type="hidden" name="shopowner" value="{{request.user.shopowner.id}}">
                     {{form.name|add_class:'form-control'}}
                     {{form.price|add_class:'form-control'}}
                     {{form.description|add_class:'form-control'}}

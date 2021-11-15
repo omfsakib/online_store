@@ -92,8 +92,9 @@
                 <h5>Products</h5>
             </div>
             <div class="card card-body">
-                <form action="" method="POST">
+                <form action="" method="POST" enctype='multipart/form-data'>
                     {% csrf_token %}
+                    <input type="hidden" name="shopowner" value="{{request.user.shopowner.id}}">
                     <p class="product-form">
                         <label for="id_name"></label>
                         {{ form.name|add_class:'form-control' }}
@@ -109,10 +110,6 @@
                     <p class="product-form">
                         <label for="id_stock">In Stock : </label>
                         {{ form.stock|add_class:'form-control' }}
-                    </p>
-                    <p class="product-form">
-                        <label for="id_discount">Discount : </label>
-                        {{ form.discount|add_class:'form-control' }}
                     </p>
                         <div class="dropdown">
                             <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -56,6 +56,7 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
+    shopowner = models.ForeignKey(ShopOwner, null=True, on_delete= models.SET_NULL)
     name = models.CharField(max_length=200, null=True)
     price = models.FloatField(null=True)
     category = models.ManyToManyField(Category)
@@ -67,6 +68,7 @@ class Product(models.Model):
     stock = models.IntegerField(default=0, null = True,blank = True)
     discount = models.IntegerField(default=0, null = True,blank = True)
     discount_amount = models.FloatField(default=0, null = True,blank = True)
+    rate = models.FloatField(default=0, null = True,blank = True)
 
     def __str__(self):
         return self.name

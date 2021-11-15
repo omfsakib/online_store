@@ -298,7 +298,7 @@
     <div class="top_reviewed" style="height: 45px; overflow: auto;">
       {% for i in top_reviewed %}
       {% if i.rate >= 3 %}
-      <a href="{% url 'view' i.product.id %}" class="btn btn-outline-info" style="margin-top: 5px;"><strong>{{i.product.name}}</strong>: {{i.rate|floatformat:1}}&#9733;</a>
+      <a href="{% url 'view' i.id %}" class="btn btn-outline-info" style="margin-top: 5px;"><strong>{{i.name}}</strong>: {{i.rate|floatformat:1}}&#9733;</a>
       {% endif %}
       {% endfor %}
     </div>

@@ -1,0 +1,47 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+#footer{
+  display: none;
+}
+#footer-user{
+  display: block !important;
+}
+.box-element{
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 10px;
+}
+.thumbnail{
+    display: block;
+    margin: auto;
+    height: 200px;
+    max-width: 300px;
+    background-color: #fff;
+}
+
+</style>
+<div class="container">
+        <div class="row" id="product_name">
+        {% for product in products %}
+        <div class="col-lg-4" style="margin-top:20px;">
+            <div style="background-color: #fff;">
+            <img class="thumbnail" src="{{ product.img.url }}" alt="">
+            <div class="box-element product">
+            <h6><strong>{{ product.name }}</strong></h6><hr>
+            {% if product.stock <= 0 %}
+            <button class="btn btn-disabled btn-outline-danger">Out of Stock</button>
+            {% else %}
+            <button data-product={{product.id}} data-action="add" class="btn btn-outline-success add-btn update-cart">Add to Cart</button>
+            {% endif %}
+            <a href="{% url 'view' product.id %}" class="btn btn-outline-success">View</a>
+            <h4 style="display: inline-block; float: right;"> ${{product.price|floatformat:0}}</h4>
+            </div>
+        </div>
+        </div>
+  {% endfor %}
+</div>
+</div>
+{% endblock %}

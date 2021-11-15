@@ -27,7 +27,7 @@ class UpdateOrderForm(ModelForm):
     class Meta:
         model = OrderItem
         fields = '__all__'
-        exclude = ['customer']
+        exclude = ['customer','shop']
 
 class ProductForm(ModelForm):
     name = forms.CharField(label='Product Name',widget=forms.TextInput(attrs={'placeholder': 'Product Name'}))

@@ -150,7 +150,8 @@ def logoutUser(request):
 @login_required(login_url='login')
 @shopowner_only
 def home(request):
-    orders = OrderItem.objects.all().order_by('-date_added')
+    shopowner = request.user.shopowner
+    orders = OrderItem.objects.filter(shop=shopowner).order_by('-date_added')
     customers = Customer.objects.all()
 
     total_customers = customers.count()
@@ -281,6 +282,7 @@ def change_password(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
 def products(request):
+    shopowner = request.user.shopowner
     form = ProductForm()
     emails = Subscriber.objects.all()
     df = read_frame(emails, fieldnames=['email'])
@@ -308,7 +310,7 @@ def products(request):
                 send_mail(
                     'New product added on Online Store go check it out...',
                     f'''Hello there! 
-                    Online Store just added a new product.
+                    {shopowner.user.first_name}{shopowner.user.last_name} just added a new product.
                     Name: {name}
                     Price: ${price}
                     Description: {description}
@@ -321,7 +323,7 @@ def products(request):
                 )
                 return redirect('/products')
                 
-    products = Product.objects.all()
+    products = Product.objects.filter(shopowner=shopowner)
 
     context ={'products':products,'form':form}
     return render(request,'accounts/products.html',context)
@@ -370,6 +372,7 @@ def updateStock(request,pk):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
 def productSetting(request,pk):
+    shopowner = request.user.shopowner
     product = Product.objects.get(id=pk)
     form = ProductForm(instance=product)
     if request.method == 'POST':
@@ -402,6 +405,7 @@ def customers(request, pk):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['shopowner'])
 def updateOrder(request,pk):
+    shopowner = request.user.shopowner
     order = OrderItem.objects.get(id=pk)
     
     form = UpdateOrderForm(instance=order)
@@ -409,6 +413,7 @@ def updateOrder(request,pk):
         form = UpdateOrderForm(request.POST,instance=order)
         if form.is_valid():
             form.save()
+            order.shop = shopowner
             if order.status == 'Delivered':
                 order.product.stock -= 1
                 order.product.save()
