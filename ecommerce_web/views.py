@@ -36,7 +36,7 @@ def store(request):
         items = []
         order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
         cartItems = order['get_cart_items']
-    products = Product.objects.all().order_by('-date_created')
+    products = Product.objects.all().order_by('-discount_amount','-discount','-stock','-date_created')
     date = timezone.now().date() - timedelta(days=7)
     product_week = Product.objects.filter(date_created__gt=(datetime.datetime.now()- timedelta(days=7))).order_by('-date_created')
     shops = ShopOwner.objects.all().count()
@@ -45,7 +45,7 @@ def store(request):
     total_subscriber = subscribers.count()
     total_products = products.count()
     productFilter = ProductFilter(request.GET,queryset=products)
-    top_reviewed = Product.objects.all().order_by('rate')
+    top_reviewed = Product.objects.all().order_by('-rate')
     products = productFilter.qs
     context = {
     'total_products':total_products,
@@ -103,9 +103,6 @@ def updateItem(request):
     data = json.loads(request.body)
     productId = data['productID']
     action = data['action']
-
-    print('Action:',action)
-    print('productId:',productId)
 
     customer = request.user.customer
     product = Product.objects.get(id=productId)
@@ -170,7 +167,7 @@ def productView(request,pk):
     product = Product.objects.get(id = pk)
     demo_price = product.price + product.discount_amount
 
-    review = product.review_set.all()
+    review = product.review_set.all().order_by('-created_at')
     total_review = review.count()
     total_rate = 0
     for i in review:
@@ -194,7 +191,8 @@ def productView(request,pk):
         form = ReviewForm()
 
     stock = product.stock
-    context = {'demo_price':demo_price,'stock':stock,'avg_rating':avg_rating,'review':review,'total_review':total_review,'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    context = {'demo_price':demo_price,'stock':stock,'avg_rating':avg_rating,'review':review,'total_review':total_review,
+    'form':form,'product':product,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
     return render(request, "store/view.html",context)
 
 @login_required(login_url='login')
@@ -238,6 +236,11 @@ def view_shops(request,pk):
         order = {'get_cart_total':0, 'get_cart_items':0,'shipping':False}
     shop = ShopOwner.objects.get(id=pk)
     products = Product.objects.filter(shopowner=shop)
+    date = timezone.now().date() - timedelta(days=7)
+    product_week = products.filter(date_created__gt=(datetime.datetime.now()- timedelta(days=7))).order_by('-date_created')
+    top_reviewed = products.order_by('-rate')
+    productFilter = ProductFilter(request.GET,queryset=products)
+    products = productFilter.qs
     
-    context = {'products':products,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
+    context = {'top_reviewed':top_reviewed,'product_week':product_week,'productFilter':productFilter,'products':products,'shop':shop,'customers':customers,'shops':shops,'total_subscriber':total_subscriber,'cartItems':cartItems}
     return render(request,'store/view_shop.html',context)

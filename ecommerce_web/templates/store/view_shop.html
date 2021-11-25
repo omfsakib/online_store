@@ -21,12 +21,70 @@
     max-width: 300px;
     background-color: #fff;
 }
+.heading{
+  display: inline-block;
+  text-align: center;
+  border: 2px solid green;
+  padding: 10px;
+}
 
+.filter-form{
+    float: left;
+    display: inline-block;
+    margin-right: 20px;
+}
+.dropdown-menu ul li{
+    list-style: none;
+}
+.dropdown{
+    display: inline-block;
+    margin-right: 20px;
+}
+#product_name{
+  margin-top: 20px;
+}
 </style>
-<div class="container">
+<div class="container-fluid">
         <div class="row" id="product_name">
-        {% for product in products %}
-        <div class="col-lg-4" style="margin-top:20px;">
+          <div class="col-md-2">
+            <form action="" method="get">
+              <p><input type="text" placeholder="Search product name..." id="searchInput" style="float: left;" class="form-control" name="name" id="id_name"> <br>
+              <p class="filter-form">Price range: <br><br> <input type="number" class="form-control" placeholder="From..." name="start_price" id="id_start_price">
+                <br><input type="number" class="form-control" placeholder="To..." name="end_price" id="id_end_price"></p>
+              <p class="filter-form">Date added product:<br><br><input type="date" class="form-control" placeholder="From..." name="start_date" id="id_start_date">
+              <br> <input type="date" class="form-control" placeholder="To..." name="end_date" id="id_end_date"></p>
+              <div class="dropdown filter-form">
+                <button style="width: 100%;" class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Filter Category
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <input class="form-control" type="text" id="categoryInput" onkeyup="categoryFunction()" placeholder="Search tags">
+                    {{ productFilter.form.category }}
+                </div>
+              </div>
+              <div class="dropdown filter-form">
+               <button style="width: 100%;" class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Filter Tags
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <input class="form-control" type="text" id="tagInput" onkeyup="tagFunction()" placeholder="Search tags">
+                    {{ productFilter.form.tags }}
+                </div>
+              </div>
+              <p class="filter-form"><br><button class="btn btn-md btn-info" type="submit">Filter</button></p>
+            </form>
+          </div>
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card card-body ">
+                  <h3 class="heading">{{shop.user.first_name}} {{shop.user.last_name}}</h3>
+                </div>
+              </div>
+            </div>
+            <div class="row">    
+             {% for product in products %}
+        <div class="col-lg-3" style="margin-top:20px;">
             <div style="background-color: #fff;">
             <img class="thumbnail" src="{{ product.img.url }}" alt="">
             <div class="box-element product">
@@ -42,6 +100,27 @@
         </div>
         </div>
   {% endfor %}
+</div>
+</div>
+<div class="col-md-2">
+  <form method="get">
+    <p><input class="form-control" type="text" id="liveInput" onkeyup="productFunction()" placeholder="Search product...."> <br>
+  </form>
+  <p>Product added in last 7 days: </p>
+  <div class="product_week" style="height: 45px; overflow: auto;">
+    {% for i in product_week %}
+    <a href="{% url 'view' i.id %}" class="btn btn-outline-info" style="margin-top: 5px;">{{i.name}}</a>
+    {% endfor %}
+  </div><br>
+  <p>Top Reviewed Product: </p>
+  <div class="top_reviewed" style="height: 45px; overflow: auto;">
+    {% for i in top_reviewed %}
+    {% if i.rate >= 3 %}
+    <a href="{% url 'view' i.id %}" class="btn btn-outline-info" style="margin-top: 5px;"><strong>{{i.name}}</strong>: {{i.rate|floatformat:1}}&#9733;</a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
 </div>
 </div>
 {% endblock %}

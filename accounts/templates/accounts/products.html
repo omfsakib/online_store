@@ -138,7 +138,13 @@
             <div class="card card-body">
                 <div class="buttons">
                     <a href="{% url 'tag' %}" style="width: 200px;" class="btn btn-outline-info">Create Tag</a>
-                    <a href="{% url 'category' %}" style="width: 200px;" class="btn btn-outline-info">Create Catgory</a></div>
+                    <a href="{% url 'category' %}" style="width: 200px;" class="btn btn-outline-info">Create Catgory</a>
+                    <a href="{% url 'flash' %}" style="width: 200px;" class="btn btn-outline-success">Flash Discount</a>
+                    <form method="GET">
+                      {% csrf_token %}
+                      <input type="hidden" name="id" value="0">
+                      <input type="submit" class="btn btn-outline-danger" name="flash_discount" value="Remove flash discount">
+                  </form></div>
             </div>
             <div class="card card-body">
                 <input id="myInput" class="form-control" onkeyup="searchFunction()" type="text" placeholder="Search..">

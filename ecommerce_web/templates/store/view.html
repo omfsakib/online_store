@@ -172,7 +172,7 @@
         <button type="button" class="collapsible">{{total_review}} REVIEWS</button>
         <div class="content">
           {% for i in review %}
-          <p>Reviewed by: {{i.user}}</p>
+          <p>Reviewed by: <strong>{{i.user}} </strong>at {{i.created_at}}</p>
           <p>{{i.comment}}</p>
             <p class="star_review">
               {% if i.rate == 1 %}

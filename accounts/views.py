@@ -231,19 +231,21 @@ def accountSettings(request):
         cartItems = 0
 
     group = Group.objects.get(name = 'customer')
-    print(group)
+
     try: 
         customer = request.user.customer
         form = CustomerForm(instance=customer)
     except:
         shopowner = request.user.shopowner
         form = ShopOwnerForm(instance=shopowner)
+
     form2 = UpdateProfileForm(instance=request.user)
     if request.method == 'POST':
         try:
             form = CustomerForm(request.POST, request.FILES, instance=customer)
         except:
             form = ShopOwnerForm(request.POST, request.FILES, instance=shopowner)
+            
         form2 = UpdateProfileForm(request.POST, instance=request.user)
         if (form and form2).is_valid():
             form.save()
@@ -283,6 +285,7 @@ def change_password(request):
 @allowed_users(allowed_roles=['shopowner'])
 def products(request):
     shopowner = request.user.shopowner
+    products = Product.objects.filter(shopowner = shopowner)
     form = ProductForm()
     emails = Subscriber.objects.all()
     df = read_frame(emails, fieldnames=['email'])
@@ -297,6 +300,15 @@ def products(request):
             product.discount = 0
             product.save()
             return redirect('/products')
+
+        elif request.method == 'GET':
+            flash_discount = request.GET.get('id')
+            print(flash_discount)
+            if flash_discount == 0:
+                for product in products:
+                    product.price += product.discount_amount
+                    product.save()
+                return redirect('/products')
 
     except:
         if request.method == 'POST':
@@ -322,8 +334,6 @@ def products(request):
                     fail_silently=False
                 )
                 return redirect('/products')
-                
-    products = Product.objects.filter(shopowner=shopowner)
 
     context ={'products':products,'form':form}
     return render(request,'accounts/products.html',context)
@@ -459,3 +469,22 @@ def mail_letter(request):
 
     context = {'form':form,'mails':mails,'emails':emails}
     return render(request, 'accounts\mail_letter.html',context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['shopowner'])
+def flashSell(request):
+    shop = request.user.shopowner
+    products = Product.objects.filter(shopowner=shop)
+    print(products)
+    if request.method == 'POST':
+        discount = int(request.POST.get('discount'))
+        for product in products:
+            product.discount_amount = product.price*(discount/100)
+            product.price -= product.discount_amount
+            product.discount = discount
+            product.save()
+        return redirect('/products')
+
+    context = {}
+    return render(request,'accounts/flash.html',context)

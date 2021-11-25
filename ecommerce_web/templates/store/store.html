@@ -285,8 +285,7 @@
   </div></div>
   <div class="col-md-3">
     <form method="get">
-      <p><input class="form-control" type="text" id="liveInput" onkeyup="productFunction()" placeholder="Search product...."> 
-        <button class="btn btn-info" style="margin-left: 15px;" type="submit">Search</button></p>
+      <p><input class="form-control" type="text" id="liveInput" onkeyup="productFunction()" placeholder="Search product...."> <br> <br>
     </form>
     <p>Product added in last 7 days: </p>
     <div class="product_week" style="height: 45px; overflow: auto;">
@@ -304,7 +303,7 @@
     </div>
   </div>
 </div>
-{% if total_products > 8 %}
+{% if total_products > 16 %}
 <div class="row paginated" id="product_name">
 {% else %}
 <div class="row" id="product_name">
